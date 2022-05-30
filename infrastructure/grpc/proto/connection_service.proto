@@ -8,14 +8,38 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
 service ConnectionService{
-  rpc Get(GetRequest) returns(GetResponse) {
-    option (google.api.http) = {
-      get: "/company/{id}"
+  rpc GetRequestsForUser(GetRequest) returns(ConnectionRequests){
+    option(google.api.http) = {
+      get: "/conn/connection-request/by-user/{id}"
     };
   }
-  rpc GetAll(GetAllRequest) returns(GetAllResponse) {
+
+  rpc AcceptConnectionRequest(GetRequest) returns(ConnectionResponse){
+    option(google.api.http) = {
+      post: "/conn/connection-request/accept/{id}"
+    };
+  }
+  rpc DeleteConnectionRequest(GetRequest) returns(ConnectionResponse){
+    option(google.api.http) = {
+      delete: "/conn/connection-request/{id}"
+    };
+  }
+
+  rpc DeleteConnection(ConnectionBody) returns(ConnectionResponse){
+    option(google.api.http) = {
+      put: "/conn/user/delete-connection"
+      body: "connection"
+    };
+  }
+  rpc RequestConnection(ConnectionBody) returns(ConnectionResponse){
     option (google.api.http) = {
-      get: "/company"
+      post: "/conn/connection-request"
+      body: "connection"
+    };
+  }
+  rpc GetConnectionUsernamesForUser(UserUsername) returns(UserConnectionUsernames){
+    option(google.api.http) = {
+      get: "/conn/user/user-connection-usernames/{username}",
     };
   }
 }
