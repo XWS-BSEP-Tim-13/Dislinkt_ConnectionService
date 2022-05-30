@@ -85,7 +85,7 @@ func (u *ConnectionNeo4jStore) persistConnectionBetweenUsers(tx neo4j.Transactio
 
 func (u *ConnectionNeo4jStore) findConnectionsByUsername(tx neo4j.Transaction, username string) ([]string, error) {
 	records, err := tx.Run(
-		"MATCH (u:RegisteredUserNode {username: $username})-[:FOLLOWS]->(connection) RETURN connection.username",
+		"MATCH (u:RegisteredUserNode {username: $username})-[:FOLLOWS]->(connection) RETURN connection.username as usernameRet",
 		map[string]interface{}{
 			"username": username,
 		},
@@ -97,9 +97,8 @@ func (u *ConnectionNeo4jStore) findConnectionsByUsername(tx neo4j.Transaction, u
 	var results []string
 	for records.Next() {
 		record := records.Record()
-		username, _ := record.Get("username")
-		fmt.Println(username)
-		results = append(results, username.(string))
+		username2, _ := record.Get("usernameRet")
+		results = append(results, username2.(string))
 	}
 
 	return results, nil
