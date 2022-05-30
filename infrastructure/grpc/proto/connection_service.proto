@@ -126,10 +126,33 @@ message Education {
   string description = 7;
 }
 
+message ConnectionRequests{
+  repeated ConnectionRequest requests= 1;
+}
+
 message ConnectionRequest {
   string id = 1;
   User from = 2;
   User to = 3;
   google.protobuf.Timestamp requestTime = 4;
+}
+
+message ConnectionResponse{}
+
+message ConnectionBody{
+  Connection connection = 1;
+}
+
+message Connection{
+  string idFrom = 1;
+  string idTo = 2;
+}
+
+message UserUsername{
+  string username = 1;
+}
+
+message UserConnectionUsernames{
+  repeated string usernames = 1;
 }
 

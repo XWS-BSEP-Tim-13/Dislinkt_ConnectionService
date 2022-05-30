@@ -27,7 +27,8 @@ func NewServer(config *config.Config) *Server {
 func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
 	connectionStore := server.initConnectionStore(mongoClient)
-	connectionService := server.initConnectionService(connectionStore)
+	userStore := server.initUserStore(mongoClient)
+	connectionService := server.initConnectionService(connectionStore, userStore)
 	connectionHandler := server.initConnectionHandler(connectionService)
 	server.startGrpcServer(connectionHandler)
 }
@@ -41,19 +42,26 @@ func (server *Server) initMongoClient() *mongo.Client {
 }
 
 func (server *Server) initConnectionStore(client *mongo.Client) domain.ConnectionStore {
-	store := persistence.NewCompanyMongoDBStore(client)
+	store := persistence.NewConnectionMongoDBStore(client)
 	store.DeleteAll()
-	for _, company := range companies {
-		err := store.Insert(company)
+
+	for _, connection := range connections {
+		err := store.Insert(connection)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
+
 	return store
 }
 
-func (server *Server) initConnectionService(store domain.ConnectionStore) *application.ConnectionService {
-	return application.NewConnectionService(store)
+func (server *Server) initUserStore(client *mongo.Client) domain.UserStore {
+	store := persistence.NewUserMongoDBStore(client)
+	return store
+}
+
+func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore) *application.ConnectionService {
+	return application.NewConnectionService(store, userStore)
 }
 
 func (server *Server) initConnectionHandler(service *application.ConnectionService) *api.ConnectionHandler {
