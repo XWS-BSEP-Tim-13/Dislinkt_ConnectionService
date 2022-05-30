@@ -72,6 +72,11 @@ type RegisteredUser struct {
 	Username    string               `bson:"username" validate:"required,username"`
 }
 
+type RegisteredUserNode struct {
+	Email    string `json:"email" validate:"required,email"`
+	Username string `json:"username" validate:"required,username"`
+}
+
 type ConnectionRequest struct {
 	Id          primitive.ObjectID `bson:"_id"`
 	From        RegisteredUser     `bson:"from"`

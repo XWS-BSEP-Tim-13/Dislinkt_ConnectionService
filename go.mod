@@ -3,8 +3,8 @@ module github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService
 go 1.18
 
 require (
-	github.com/XWS-BSEP-Tim-13/Dislinkt_UserService v1.1.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
+	github.com/neo4j/neo4j-go-driver/v4 v4.4.3
 	go.mongodb.org/mongo-driver v1.9.1
 	google.golang.org/grpc v1.46.0
 )
@@ -18,14 +18,9 @@ require (
 )
 
 require (
-	github.com/go-playground/locales v0.14.0 // indirect
-	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
-	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
@@ -34,4 +29,5 @@ require (
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 // indirect
 	golang.org/x/text v0.3.7 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

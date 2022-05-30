@@ -3,19 +3,22 @@ package application
 import (
 	"fmt"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/domain"
+	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/persistence"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
 type ConnectionService struct {
-	store     domain.ConnectionStore
-	userStore domain.UserStore
+	store           domain.ConnectionStore
+	userStore       domain.UserStore
+	connectionNeo4j persistence.ConnectionNeo4jStore
 }
 
-func NewConnectionService(store domain.ConnectionStore, userStore domain.UserStore) *ConnectionService {
+func NewConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4j persistence.ConnectionNeo4jStore) *ConnectionService {
 	return &ConnectionService{
-		store:     store,
-		userStore: userStore,
+		store:           store,
+		userStore:       userStore,
+		connectionNeo4j: neo4j,
 	}
 }
 
@@ -38,24 +41,31 @@ func (service *ConnectionService) RequestConnection(idFrom, idTo primitive.Objec
 	} else {
 		fmt.Println("PUBLIC")
 		toUser.Connections = append(toUser.Connections, idFrom)
+		//TODO Create connection between users -> neo4j
 		service.userStore.Update(toUser)
+		service.connectionNeo4j.CreateConnection(toUser, fromUser)
 	}
 	fmt.Printf("Saved to db: \n")
 	return nil
 }
 
 func (service *ConnectionService) GetConnectionUsernamesForUser(username string) ([]string, error) {
-	user, err := service.userStore.GetActiveByUsername(username)
+	/*user, err := service.userStore.GetActiveByUsername(username)
 	if err != nil {
 		return nil, err
-	}
+	}*/
 	var retVal []string
-	for _, conId := range user.Connections {
+	//TODO find users connections
+	/*for _, conId := range user.Connections {
 		conUser, _ := service.userStore.GetActiveById(conId)
 		retVal = append(retVal, conUser.Username)
 		fmt.Printf("Username : %s\n", conUser.Username)
+	}*/
+	connections, _ := service.connectionNeo4j.FindUsersConnection(username)
+	for _, connUsername := range connections {
+		retVal = append(retVal, connUsername)
 	}
-	retVal = append(retVal, username)
+	//retVal = append(retVal, username)
 	return retVal, nil
 }
 
@@ -67,6 +77,8 @@ func (service *ConnectionService) AcceptConnection(connectionId primitive.Object
 	connection.To.Connections = append(connection.To.Connections, connection.From.Id)
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
 	err1 := service.userStore.Update(&connection.To)
+	//TODO Create connection between users
+	service.connectionNeo4j.CreateConnection(&connection.From, &connection.To)
 	if err != nil {
 		return err1
 	}
@@ -94,6 +106,7 @@ func (service *ConnectionService) DeleteConnection(idFrom, idTo primitive.Object
 	user.Connections[indx] = user.Connections[len(user.Connections)-1]
 	user.Connections = user.Connections[:len(user.Connections)-1]
 	err = service.userStore.Update(user)
+	//TODO delete connection between users
 	if err != nil {
 		return err
 	}

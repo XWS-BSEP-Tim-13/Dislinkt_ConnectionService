@@ -19,7 +19,7 @@ type UserMongoDBStore struct {
 }
 
 func NewUserMongoDBStore(client *mongo.Client) domain.UserStore {
-	users := client.Database(DATABASE).Collection(COLLECTION)
+	users := client.Database(USER_DATABASE).Collection(USER_COLLECTION)
 	return &UserMongoDBStore{
 		users: users,
 	}
