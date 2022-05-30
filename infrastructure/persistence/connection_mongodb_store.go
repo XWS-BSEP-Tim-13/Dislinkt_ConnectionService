@@ -39,11 +39,6 @@ func (store ConnectionsMongoDBStore) Get(id primitive.ObjectID) (*domain.Connect
 	return store.filterOne(filter)
 }
 
-func (store ConnectionsMongoDBStore) GetAll() ([]*domain.ConnectionRequest, error) {
-	filter := bson.D{{}}
-	return store.filter(filter)
-}
-
 func (store ConnectionsMongoDBStore) Insert(connection *domain.ConnectionRequest) error {
 	result, err := store.connections.InsertOne(context.TODO(), connection)
 	if err != nil {
