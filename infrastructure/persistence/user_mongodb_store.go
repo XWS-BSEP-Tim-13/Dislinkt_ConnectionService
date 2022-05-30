@@ -57,6 +57,19 @@ func (store *UserMongoDBStore) Update(user *domain.RegisteredUser) (err error) {
 	return nil
 }
 
+func (store *UserMongoDBStore) Insert(user *domain.RegisteredUser) error {
+	result, err := store.users.InsertOne(context.TODO(), user)
+	if err != nil {
+		return err
+	}
+	user.Id = result.InsertedID.(primitive.ObjectID)
+	return nil
+}
+
+func (store *UserMongoDBStore) DeleteAll() {
+	store.users.DeleteMany(context.TODO(), bson.D{{}})
+}
+
 func (store *UserMongoDBStore) filter(filter interface{}) ([]*domain.RegisteredUser, error) {
 	cursor, err := store.users.Find(context.TODO(), filter)
 	defer cursor.Close(context.TODO())

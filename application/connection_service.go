@@ -27,6 +27,7 @@ func (service *ConnectionService) RequestConnection(idFrom, idTo primitive.Objec
 	}
 	fmt.Printf("In service trace: \n")
 	if toUser.IsPrivate {
+		fmt.Println("PRIVATE")
 		var request = domain.ConnectionRequest{
 			Id:          primitive.NewObjectID(),
 			From:        *fromUser,
@@ -35,6 +36,7 @@ func (service *ConnectionService) RequestConnection(idFrom, idTo primitive.Objec
 		}
 		service.store.Insert(&request)
 	} else {
+		fmt.Println("PUBLIC")
 		toUser.Connections = append(toUser.Connections, idFrom)
 		service.userStore.Update(toUser)
 	}

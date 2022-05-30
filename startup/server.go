@@ -57,6 +57,13 @@ func (server *Server) initConnectionStore(client *mongo.Client) domain.Connectio
 
 func (server *Server) initUserStore(client *mongo.Client) domain.UserStore {
 	store := persistence.NewUserMongoDBStore(client)
+	store.DeleteAll()
+	for _, user := range users {
+		err := store.Insert(user)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	return store
 }
 
