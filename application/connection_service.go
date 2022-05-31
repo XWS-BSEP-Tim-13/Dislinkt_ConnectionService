@@ -28,9 +28,7 @@ func (service *ConnectionService) RequestConnection(idFrom, idTo primitive.Objec
 	if err != nil {
 		return err
 	}
-	fmt.Printf("In service trace: \n")
 	if toUser.IsPrivate {
-		fmt.Println("PRIVATE")
 		var request = domain.ConnectionRequest{
 			Id:          primitive.NewObjectID(),
 			From:        *fromUser,
@@ -39,9 +37,7 @@ func (service *ConnectionService) RequestConnection(idFrom, idTo primitive.Objec
 		}
 		service.store.Insert(&request)
 	} else {
-		fmt.Println("PUBLIC")
 		toUser.Connections = append(toUser.Connections, idFrom)
-		//TODO Create connection between users -> neo4j
 		service.userStore.Update(toUser)
 		service.connectionNeo4j.CreateConnection(toUser, fromUser)
 	}
@@ -55,7 +51,6 @@ func (service *ConnectionService) GetConnectionUsernamesForUser(username string)
 		return nil, err
 	}*/
 	var retVal []string
-	//TODO find users connections
 	/*for _, conId := range user.Connections {
 		conUser, _ := service.userStore.GetActiveById(conId)
 		retVal = append(retVal, conUser.Username)
@@ -77,7 +72,6 @@ func (service *ConnectionService) AcceptConnection(connectionId primitive.Object
 	connection.To.Connections = append(connection.To.Connections, connection.From.Id)
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
 	err1 := service.userStore.Update(&connection.To)
-	//TODO Create connection between users
 	service.connectionNeo4j.CreateConnection(&connection.From, &connection.To)
 	if err != nil {
 		return err1
@@ -103,10 +97,13 @@ func (service *ConnectionService) DeleteConnection(idFrom, idTo primitive.Object
 	if indx == -1 {
 		return nil
 	}
+	//TODO delete connection between users
+	userFrom, err := service.userStore.GetActiveById(idFrom)
+	service.connectionNeo4j.DeleteConnection(userFrom.Username, user.Username)
+	
 	user.Connections[indx] = user.Connections[len(user.Connections)-1]
 	user.Connections = user.Connections[:len(user.Connections)-1]
 	err = service.userStore.Update(user)
-	//TODO delete connection between users
 	if err != nil {
 		return err
 	}

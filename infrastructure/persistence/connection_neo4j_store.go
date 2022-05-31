@@ -6,6 +6,10 @@ import (
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 )
 
+const (
+	FOLLOW_CONNECTION = "FOLLOWS"
+)
+
 type ConnectionNeo4jStore struct {
 	Driver neo4j.Driver
 }
@@ -61,6 +65,24 @@ func (u *ConnectionNeo4jStore) FindUsersConnection(username string) (connections
 	}
 	connections = result.([]string)
 	return connections, err
+}
+
+func (u *ConnectionNeo4jStore) DeleteConnection(usernameFrom string, usernameTo string) (ret interface{}, err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{})
+	defer func() {
+		err = session.Close()
+	}()
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (:RegisteredUserNode {username: $usernameFrom})-[r:FOLLOWS]->(:RegisteredUserNode {username: $usernameTo}) DELETE r"
+		parameters := map[string]interface{}{
+			"usernameFrom": usernameFrom,
+			"usernameTo":   usernameTo,
+		}
+		_, err := tx.Run(query, parameters)
+		return nil, err
+	})
+
+	return nil, err
 }
 
 func (u *ConnectionNeo4jStore) persistUserAsNode(tx neo4j.Transaction, user *domain.RegisteredUser) (interface{}, error) {
