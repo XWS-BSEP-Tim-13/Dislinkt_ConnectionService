@@ -28,7 +28,7 @@ COPY --from=builder /app/main .
 # Expose port 8000 to the outside world
 EXPOSE 8000
 
-VOLUME root/cert
+VOLUME /root/cert
 
 # Command to run the executable
 CMD ["./main"]
