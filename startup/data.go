@@ -133,7 +133,48 @@ var users = []*domain.RegisteredUser{
 	},
 }
 
-var connections []*domain.ConnectionRequest
+var connections = []*domain.ConnectionRequest{
+	{
+		Id: getObjectId("62b89e802697fd8b2ce82138"),
+		From: domain.RegisteredUser{
+			Id:          getObjectId("723b0cc3a34d25d8567f9f86"),
+			FirstName:   "Lenka",
+			LastName:    "Aleksic",
+			Email:       "lenka@gmail.com",
+			PhoneNumber: "064364364",
+			Username:    "lenka",
+			Gender:      1,
+			DateOfBirth: time.Time{},
+			Biography:   "biography sample",
+			IsPrivate:   false,
+			IsActive:    true,
+			Experiences: []domain.Experience{},
+			Educations:  []domain.Education{},
+			Skills:      []string{"s1", "s2"},
+			Interests:   []primitive.ObjectID{},
+			Connections: []string{},
+		},
+		To: domain.RegisteredUser{
+			Id:          getObjectId("723b0cc3a34d25d8567f9f83"),
+			FirstName:   "Stefan",
+			LastName:    "Ljubovic",
+			Email:       "ljubovicstefan@gmail.com",
+			PhoneNumber: "0654324995",
+			Username:    "stefanljubovic",
+			Gender:      0,
+			DateOfBirth: time.Time{},
+			Biography:   "biography sample",
+			IsPrivate:   true,
+			IsActive:    true,
+			Experiences: []domain.Experience{},
+			Educations:  []domain.Education{},
+			Skills:      []string{"s1", "s2"},
+			Interests:   []primitive.ObjectID{},
+			Connections: []string{"marijakljestan", "anagavrilovic", "srdjansukovic"},
+		},
+		RequestTime: time.Time{},
+	},
+}
 
 func getObjectId(id string) primitive.ObjectID {
 	if objectId, err := primitive.ObjectIDFromHex(id); err == nil {

@@ -20,6 +20,23 @@ func NewConnectionNeo4jStore(driver neo4j.Driver) ConnectionNeo4jStore {
 	}
 }
 
+/*
+func  (u *ConnectionNeo4jStore) InitConnections() (err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer func() {
+		err = session.Close()
+	}()
+
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		return u.persistUserAsNode(tx, toUser)
+	}); err != nil {
+		fmt.Println(err)
+		return err
+	}
+}*/
+
 func (u *ConnectionNeo4jStore) CreateConnection(toUser *domain.RegisteredUser, fromUser *domain.RegisteredUser) (err error) {
 	session := u.Driver.NewSession(neo4j.SessionConfig{
 		AccessMode: neo4j.AccessModeWrite,
