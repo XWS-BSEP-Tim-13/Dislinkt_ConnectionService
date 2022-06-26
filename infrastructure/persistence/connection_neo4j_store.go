@@ -67,6 +67,21 @@ func (u *ConnectionNeo4jStore) FindUsersConnection(username string) (connections
 	return connections, err
 }
 
+func (u *ConnectionNeo4jStore) FindSuggestedConnectionsForUser(username string) (suggestions []string, err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{})
+	defer func() {
+		err = session.Close()
+	}()
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		return u.findSuggestedConnectionsForUser(tx, username)
+	})
+	if result == nil {
+		return nil, err
+	}
+	suggestions = result.([]string)
+	return suggestions, err
+}
+
 func (u *ConnectionNeo4jStore) DeleteConnection(usernameFrom string, usernameTo string) (ret interface{}, err error) {
 	session := u.Driver.NewSession(neo4j.SessionConfig{})
 	defer func() {
@@ -108,6 +123,27 @@ func (u *ConnectionNeo4jStore) persistConnectionBetweenUsers(tx neo4j.Transactio
 func (u *ConnectionNeo4jStore) findConnectionsByUsername(tx neo4j.Transaction, username string) ([]string, error) {
 	records, err := tx.Run(
 		"MATCH (u:RegisteredUserNode {username: $username})-[:FOLLOWS]->(connection) RETURN connection.username as usernameRet",
+		map[string]interface{}{
+			"username": username,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []string
+	for records.Next() {
+		record := records.Record()
+		username2, _ := record.Get("usernameRet")
+		results = append(results, username2.(string))
+	}
+
+	return results, nil
+}
+
+func (u *ConnectionNeo4jStore) findSuggestedConnectionsForUser(tx neo4j.Transaction, username string) ([]string, error) {
+	records, err := tx.Run(
+		"MATCH (u:RegisteredUserNode {username: $username})-[:FOLLOWS]->()-[:FOLLOWS]->(connection) RETURN connection.username as usernameRet",
 		map[string]interface{}{
 			"username": username,
 		},

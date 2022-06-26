@@ -100,7 +100,7 @@ func (service *ConnectionService) DeleteConnection(idFrom, idTo primitive.Object
 	//TODO delete connection between users
 	userFrom, err := service.userStore.GetActiveById(idFrom)
 	service.connectionNeo4j.DeleteConnection(userFrom.Username, user.Username)
-	
+
 	user.Connections[indx] = user.Connections[len(user.Connections)-1]
 	user.Connections = user.Connections[:len(user.Connections)-1]
 	err = service.userStore.Update(user)
@@ -118,4 +118,14 @@ func (service *ConnectionService) GetRequestsForUser(id primitive.ObjectID) ([]*
 	resp, err := service.store.GetRequestsForUser(id)
 	fmt.Printf("Response %d\n", len(resp))
 	return resp, err
+}
+
+func (service *ConnectionService) GetSuggestedConnectionUsernamesForUser(username string) ([]string, error) {
+	var retVal []string
+	connections, _ := service.connectionNeo4j.FindSuggestedConnectionsForUser(username)
+	for _, connUsername := range connections {
+		retVal = append(retVal, connUsername)
+	}
+
+	return retVal, nil
 }

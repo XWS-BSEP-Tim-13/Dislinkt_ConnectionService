@@ -92,3 +92,15 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 	}
 	return response, nil
 }
+
+func (handler *ConnectionHandler) GetSuggestedConnectionUsernamesForUser(ctx context.Context, request *pb.UserUsername) (*pb.UserConnectionUsernames, error) {
+	fmt.Printf("Username: %s\n", request.Username)
+	connUsernames, err := handler.service.GetSuggestedConnectionUsernamesForUser(request.Username)
+	response := &pb.UserConnectionUsernames{
+		Usernames: connUsernames,
+	}
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}

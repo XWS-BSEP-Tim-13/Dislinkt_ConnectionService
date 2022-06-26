@@ -42,6 +42,11 @@ service ConnectionService{
       get: "/conn/user/user-connection-usernames/{username}",
     };
   }
+  rpc GetSuggestedConnectionUsernamesForUser(UserUsername) returns(UserConnectionUsernames){
+    option(google.api.http) = {
+      get: "/conn/user/suggested-connection-usernames/{username}",
+    };
+  }
 }
 
 message GetRequest {
