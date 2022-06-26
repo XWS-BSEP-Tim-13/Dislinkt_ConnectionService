@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ConnectionServiceClient interface {
-	GetRequestsForUser(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ConnectionRequests, error)
+	GetRequestsForUser(ctx context.Context, in *GetRequestUsername, opts ...grpc.CallOption) (*ConnectionRequests, error)
 	AcceptConnectionRequest(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	DeleteConnectionRequest(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	DeleteConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
@@ -39,7 +39,7 @@ func NewConnectionServiceClient(cc grpc.ClientConnInterface) ConnectionServiceCl
 	return &connectionServiceClient{cc}
 }
 
-func (c *connectionServiceClient) GetRequestsForUser(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ConnectionRequests, error) {
+func (c *connectionServiceClient) GetRequestsForUser(ctx context.Context, in *GetRequestUsername, opts ...grpc.CallOption) (*ConnectionRequests, error) {
 	out := new(ConnectionRequests)
 	err := c.cc.Invoke(ctx, "/connection.ConnectionService/GetRequestsForUser", in, out, opts...)
 	if err != nil {
@@ -106,7 +106,7 @@ func (c *connectionServiceClient) GetSuggestedConnectionUsernamesForUser(ctx con
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
 type ConnectionServiceServer interface {
-	GetRequestsForUser(context.Context, *GetRequest) (*ConnectionRequests, error)
+	GetRequestsForUser(context.Context, *GetRequestUsername) (*ConnectionRequests, error)
 	AcceptConnectionRequest(context.Context, *GetRequest) (*ConnectionResponse, error)
 	DeleteConnectionRequest(context.Context, *GetRequest) (*ConnectionResponse, error)
 	DeleteConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
@@ -120,7 +120,7 @@ type ConnectionServiceServer interface {
 type UnimplementedConnectionServiceServer struct {
 }
 
-func (UnimplementedConnectionServiceServer) GetRequestsForUser(context.Context, *GetRequest) (*ConnectionRequests, error) {
+func (UnimplementedConnectionServiceServer) GetRequestsForUser(context.Context, *GetRequestUsername) (*ConnectionRequests, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRequestsForUser not implemented")
 }
 func (UnimplementedConnectionServiceServer) AcceptConnectionRequest(context.Context, *GetRequest) (*ConnectionResponse, error) {
@@ -155,7 +155,7 @@ func RegisterConnectionServiceServer(s grpc.ServiceRegistrar, srv ConnectionServ
 }
 
 func _ConnectionService_GetRequestsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
+	in := new(GetRequestUsername)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func _ConnectionService_GetRequestsForUser_Handler(srv interface{}, ctx context.
 		FullMethod: "/connection.ConnectionService/GetRequestsForUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectionServiceServer).GetRequestsForUser(ctx, req.(*GetRequest))
+		return srv.(ConnectionServiceServer).GetRequestsForUser(ctx, req.(*GetRequestUsername))
 	}
 	return interceptor(ctx, in, info, handler)
 }

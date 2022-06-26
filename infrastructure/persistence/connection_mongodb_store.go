@@ -17,7 +17,7 @@ type ConnectionsMongoDBStore struct {
 	connections *mongo.Collection
 }
 
-func NewConnectionMongoDBStore(client *mongo.Client) domain.ConnectionStore {
+func NewConnectionMongoDBStore(client *mongo.Client) *ConnectionsMongoDBStore {
 	companies := client.Database(DATABASE).Collection(COLLECTION)
 	return &ConnectionsMongoDBStore{
 		connections: companies,
@@ -29,8 +29,8 @@ func (store ConnectionsMongoDBStore) Delete(id primitive.ObjectID) {
 	store.connections.DeleteOne(context.TODO(), filter)
 }
 
-func (store ConnectionsMongoDBStore) GetRequestsForUser(id primitive.ObjectID) ([]*domain.ConnectionRequest, error) {
-	filter := bson.D{{"to._id", id}}
+func (store ConnectionsMongoDBStore) GetRequestsForUser(username string) ([]*domain.ConnectionRequest, error) {
+	filter := bson.D{{"to.username", username}}
 	return store.filter(filter)
 }
 

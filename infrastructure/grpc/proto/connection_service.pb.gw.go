@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 func request_ConnectionService_GetRequestsForUser_0(ctx context.Context, marshaler runtime.Marshaler, client ConnectionServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetRequest
+	var protoReq GetRequestUsername
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -42,14 +42,14 @@ func request_ConnectionService_GetRequestsForUser_0(ctx context.Context, marshal
 		_   = err
 	)
 
-	val, ok = pathParams["id"]
+	val, ok = pathParams["username"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "username")
 	}
 
-	protoReq.Id, err = runtime.String(val)
+	protoReq.Username, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "username", err)
 	}
 
 	msg, err := client.GetRequestsForUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -58,7 +58,7 @@ func request_ConnectionService_GetRequestsForUser_0(ctx context.Context, marshal
 }
 
 func local_request_ConnectionService_GetRequestsForUser_0(ctx context.Context, marshaler runtime.Marshaler, server ConnectionServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetRequest
+	var protoReq GetRequestUsername
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -68,14 +68,14 @@ func local_request_ConnectionService_GetRequestsForUser_0(ctx context.Context, m
 		_   = err
 	)
 
-	val, ok = pathParams["id"]
+	val, ok = pathParams["username"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "username")
 	}
 
-	protoReq.Id, err = runtime.String(val)
+	protoReq.Username, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "username", err)
 	}
 
 	msg, err := server.GetRequestsForUser(ctx, &protoReq)
@@ -372,7 +372,7 @@ func RegisterConnectionServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/connection.ConnectionService/GetRequestsForUser", runtime.WithHTTPPathPattern("/conn/connection-request/by-user/{id}"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/connection.ConnectionService/GetRequestsForUser", runtime.WithHTTPPathPattern("/conn/connection-request/by-user/{username}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -579,7 +579,7 @@ func RegisterConnectionServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/connection.ConnectionService/GetRequestsForUser", runtime.WithHTTPPathPattern("/conn/connection-request/by-user/{id}"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/connection.ConnectionService/GetRequestsForUser", runtime.WithHTTPPathPattern("/conn/connection-request/by-user/{username}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -725,7 +725,7 @@ func RegisterConnectionServiceHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_ConnectionService_GetRequestsForUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"conn", "connection-request", "by-user", "id"}, ""))
+	pattern_ConnectionService_GetRequestsForUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"conn", "connection-request", "by-user", "username"}, ""))
 
 	pattern_ConnectionService_AcceptConnectionRequest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"conn", "connection-request", "accept", "id"}, ""))
 

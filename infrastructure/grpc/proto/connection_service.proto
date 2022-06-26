@@ -8,9 +8,9 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
 service ConnectionService{
-  rpc GetRequestsForUser(GetRequest) returns(ConnectionRequests){
+  rpc GetRequestsForUser(GetRequestUsername) returns(ConnectionRequests){
     option(google.api.http) = {
-      get: "/conn/connection-request/by-user/{id}"
+      get: "/conn/connection-request/by-user/{username}"
     };
   }
 
@@ -51,6 +51,10 @@ service ConnectionService{
 
 message GetRequest {
   string id = 1;
+}
+
+message GetRequestUsername {
+  string username = 1;
 }
 
 message GetResponse {
@@ -173,8 +177,8 @@ message ConnectionBody{
 }
 
 message Connection{
-  string idFrom = 1;
-  string idTo = 2;
+  string usernameFrom = 1;
+  string usernameTo = 2;
 }
 
 message UserUsername{
