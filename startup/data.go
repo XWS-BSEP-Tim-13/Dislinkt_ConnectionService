@@ -58,7 +58,7 @@ var users = []*domain.RegisteredUser{
 		},
 		Skills:      []string{"s1", "s2"},
 		Interests:   []primitive.ObjectID{getObjectId("623b0cc3a34d25d8567f9f82")},
-		Connections: []primitive.ObjectID{getObjectId("723b0cc3a34d25d8567f9f83"), getObjectId("723b0cc3a34d25d8567f9f84")},
+		Connections: []string{"stefanljubovic", "anagavrilovic"},
 	},
 	{
 		Id:          getObjectId("723b0cc3a34d25d8567f9f83"),
@@ -76,7 +76,7 @@ var users = []*domain.RegisteredUser{
 		Educations:  []domain.Education{},
 		Skills:      []string{"s1", "s2"},
 		Interests:   []primitive.ObjectID{},
-		Connections: []primitive.ObjectID{getObjectId("723b0cc3a34d25d8567f9f84"), getObjectId("723b0cc3a34d25d8567f9f82"), getObjectId("723b0cc3a34d25d8567f9f85")},
+		Connections: []string{"marijakljestan", "anagavrilovic", "srdjansukovic"},
 	},
 	{
 		Id:          getObjectId("723b0cc3a34d25d8567f9f84"),
@@ -93,7 +93,7 @@ var users = []*domain.RegisteredUser{
 		Educations:  []domain.Education{},
 		Skills:      []string{"s1", "s2"},
 		Interests:   []primitive.ObjectID{},
-		Connections: []primitive.ObjectID{getObjectId("723b0cc3a34d25d8567f9f83"), getObjectId("723b0cc3a34d25d8567f9f82"), getObjectId("723b0cc3a34d25d8567f9f85")},
+		Connections: []string{"stefanljubovic", "srdjansukovic"},
 	},
 	{
 		Id:          getObjectId("723b0cc3a34d25d8567f9f85"),
@@ -111,7 +111,7 @@ var users = []*domain.RegisteredUser{
 		Educations:  []domain.Education{},
 		Skills:      []string{"s1", "s2"},
 		Interests:   []primitive.ObjectID{},
-		Connections: []primitive.ObjectID{getObjectId("723b0cc3a34d25d8567f9f83"), getObjectId("723b0cc3a34d25d8567f9f82")},
+		Connections: []string{"stefanljubovic", "srdjansukovic"},
 	},
 	{
 		Id:          getObjectId("723b0cc3a34d25d8567f9f86"),
@@ -129,7 +129,7 @@ var users = []*domain.RegisteredUser{
 		Educations:  []domain.Education{},
 		Skills:      []string{"s1", "s2"},
 		Interests:   []primitive.ObjectID{},
-		Connections: []primitive.ObjectID{},
+		Connections: []string{},
 	},
 }
 
