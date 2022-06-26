@@ -143,7 +143,7 @@ func (u *ConnectionNeo4jStore) findConnectionsByUsername(tx neo4j.Transaction, u
 
 func (u *ConnectionNeo4jStore) findSuggestedConnectionsForUser(tx neo4j.Transaction, username string) ([]string, error) {
 	records, err := tx.Run(
-		"MATCH (u:RegisteredUserNode {username: $username})-[:FOLLOWS]->()-[:FOLLOWS]->(connection) RETURN connection.username as usernameRet",
+		"MATCH (u:RegisteredUserNode {username: $username})-[r1:FOLLOWS]->(connection)-[r2:FOLLOWS]->(connection_of_connection) WHERE NOT connection_of_connection.username = $username RETURN DISTINCT connection_of_connection.username as usernameRet",
 		map[string]interface{}{
 			"username": username,
 		},

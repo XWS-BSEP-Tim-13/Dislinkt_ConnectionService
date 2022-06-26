@@ -46,21 +46,12 @@ func (service *ConnectionService) RequestConnection(idFrom, idTo primitive.Objec
 }
 
 func (service *ConnectionService) GetConnectionUsernamesForUser(username string) ([]string, error) {
-	/*user, err := service.userStore.GetActiveByUsername(username)
-	if err != nil {
-		return nil, err
-	}*/
 	var retVal []string
-	/*for _, conId := range user.Connections {
-		conUser, _ := service.userStore.GetActiveById(conId)
-		retVal = append(retVal, conUser.Username)
-		fmt.Printf("Username : %s\n", conUser.Username)
-	}*/
 	connections, _ := service.connectionNeo4j.FindUsersConnection(username)
 	for _, connUsername := range connections {
 		retVal = append(retVal, connUsername)
 	}
-	//retVal = append(retVal, username)
+
 	return retVal, nil
 }
 
