@@ -3,6 +3,8 @@ module github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService
 go 1.18
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
 	github.com/neo4j/neo4j-go-driver/v4 v4.4.3
 	go.mongodb.org/mongo-driver v1.9.1

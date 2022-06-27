@@ -66,6 +66,29 @@ func (store *UserMongoDBStore) Insert(user *domain.RegisteredUser) error {
 	return nil
 }
 
+func (store *UserMongoDBStore) CheckIfUsersConnected(fromUsername, toUsername string) (*domain.RegisteredUser, error) {
+	user, _ := store.GetByUsername(fromUsername)
+	filter := bson.M{"$in": bson.D{{"connections", user.Id}}}
+	filterr := bson.M{
+		"$and": []bson.M{
+			filter,
+			{"username": toUsername},
+		},
+	}
+	return store.filterOne(filterr)
+}
+
+func (store *UserMongoDBStore) CheckIfUserIsBlocked(fromUsername, toUsername string) (*domain.RegisteredUser, error) {
+	filter := bson.M{"$in": bson.D{{"blocked_users", fromUsername}}}
+	filterr := bson.M{
+		"$and": []bson.M{
+			filter,
+			{"username": toUsername},
+		},
+	}
+	return store.filterOne(filterr)
+}
+
 func (store *UserMongoDBStore) DeleteAll() {
 	store.users.DeleteMany(context.TODO(), bson.D{{}})
 }

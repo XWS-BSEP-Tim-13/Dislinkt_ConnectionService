@@ -10,4 +10,6 @@ type UserStore interface {
 	Update(user *RegisteredUser) error
 	Insert(company *RegisteredUser) error
 	DeleteAll()
+	CheckIfUsersConnected(fromUsername, toUsername string) (*RegisteredUser, error)
+	CheckIfUserIsBlocked(fromUsername, toUsername string) (*RegisteredUser, error)
 }

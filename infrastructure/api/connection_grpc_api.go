@@ -94,17 +94,19 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 	return response, nil
 }
 
-func (handler *ConnectionHandler) CheckIfUserConnected(ctx context.Context, request *pb.UserUsername) (*pb.BoolMessage, error) {
+func (handler *ConnectionHandler) CheckIfUserConnected(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionStatusResponse, error) {
 	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
-		response := &pb.BoolMessage{
-			IsConnected: false,
+		response := &pb.ConnectionStatusResponse{
+			ConnectionStatus: 4,
 		}
 		return response, nil
 	}
 	isConnected := handler.service.CheckIfUserConnected(usernameFrom, request.Username)
-	response := &pb.BoolMessage{
-		IsConnected: isConnected,
+	pbVal := pb.ConnectionStatus(isConnected)
+
+	response := &pb.ConnectionStatusResponse{
+		ConnectionStatus: pbVal,
 	}
 	return response, nil
 }

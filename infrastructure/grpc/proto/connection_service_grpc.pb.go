@@ -28,7 +28,7 @@ type ConnectionServiceClient interface {
 	DeleteConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	RequestConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	GetConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
-	CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*BoolMessage, error)
+	CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error)
 }
 
 type connectionServiceClient struct {
@@ -93,8 +93,8 @@ func (c *connectionServiceClient) GetConnectionUsernamesForUser(ctx context.Cont
 	return out, nil
 }
 
-func (c *connectionServiceClient) CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*BoolMessage, error) {
-	out := new(BoolMessage)
+func (c *connectionServiceClient) CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error) {
+	out := new(ConnectionStatusResponse)
 	err := c.cc.Invoke(ctx, "/connection.ConnectionService/CheckIfUserConnected", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ type ConnectionServiceServer interface {
 	DeleteConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
 	RequestConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
 	GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
-	CheckIfUserConnected(context.Context, *UserUsername) (*BoolMessage, error)
+	CheckIfUserConnected(context.Context, *UserUsername) (*ConnectionStatusResponse, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -138,7 +138,7 @@ func (UnimplementedConnectionServiceServer) RequestConnection(context.Context, *
 func (UnimplementedConnectionServiceServer) GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConnectionUsernamesForUser not implemented")
 }
-func (UnimplementedConnectionServiceServer) CheckIfUserConnected(context.Context, *UserUsername) (*BoolMessage, error) {
+func (UnimplementedConnectionServiceServer) CheckIfUserConnected(context.Context, *UserUsername) (*ConnectionStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckIfUserConnected not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}

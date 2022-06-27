@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"fmt"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -55,6 +56,7 @@ func (store ConnectionsMongoDBStore) CheckIfUsersConnected(usernameFrom, usernam
 	filter := bson.M{"to.username": usernameTo, "from.username": usernameFrom}
 	_, err := store.filterOne(filter)
 	if err != nil {
+		fmt.Println(err)
 		return false
 	}
 	return true

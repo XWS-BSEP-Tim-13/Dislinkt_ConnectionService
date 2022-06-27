@@ -3,7 +3,7 @@ package jwt
 import (
 	"context"
 	"errors"
-	"github.com/XWS-BSEP-Tim-13/Dislinkt_PostService/startup/config"
+	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/startup/config"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"google.golang.org/grpc"

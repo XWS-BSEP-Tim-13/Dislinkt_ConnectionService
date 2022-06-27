@@ -42,7 +42,7 @@ service ConnectionService{
       get: "/conn/user/user-connection-usernames/{username}",
     };
   }
-  rpc CheckIfUserConnected(UserUsername)returns(BoolMessage){
+  rpc CheckIfUserConnected(UserUsername)returns(ConnectionStatusResponse){
     option(google.api.http) = {
       get: "/conn/user/users-connected/{username}",
     };
@@ -94,6 +94,17 @@ enum EmploymentType {
   PART_TIME = 1;
   INTERNSHIP = 2;
   NONE = 3;
+}
+
+message ConnectionStatusResponse{
+  ConnectionStatus connectionStatus=1;
+}
+
+enum ConnectionStatus {
+  CONNECTED = 0;
+  CONNECTION_REQUEST = 1;
+  NONEE = 2;
+  BLOCKED = 3;
 }
 
 message User {

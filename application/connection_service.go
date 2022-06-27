@@ -3,6 +3,7 @@ package application
 import (
 	"fmt"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/domain"
+	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/domain/enum"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/persistence"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
@@ -120,6 +121,18 @@ func (service *ConnectionService) GetRequestsForUser(id primitive.ObjectID) ([]*
 	return resp, err
 }
 
-func (service *ConnectionService) CheckIfUserConnected(fromUsername, toUsername string) bool {
-	return service.store.CheckIfUsersConnected(fromUsername, toUsername)
+func (service *ConnectionService) CheckIfUserConnected(fromUsername, toUsername string) enum.ConnectionStatus {
+	_, err := service.userStore.CheckIfUsersConnected(fromUsername, toUsername)
+	if err == nil {
+		return enum.CONNECTED
+	}
+	_, err = service.userStore.CheckIfUserIsBlocked(fromUsername, toUsername)
+	if err != nil {
+		return enum.BLOCKED
+	}
+	isRequested := service.store.CheckIfUsersConnected(fromUsername, toUsername)
+	if isRequested {
+		return enum.CONNECTION_REQUEST
+	}
+	return enum.NONE
 }
