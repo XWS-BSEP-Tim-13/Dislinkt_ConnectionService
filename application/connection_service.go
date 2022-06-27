@@ -62,42 +62,42 @@ func (service *ConnectionService) AcceptConnection(connectionId primitive.Object
 	}
 	connection.To.Connections = append(connection.To.Connections, connection.From.Username)
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
-	err1 := service.userStore.Update(&connection.To)
+	//err1 := service.userStore.Update(&connection.To)
 	service.connectionNeo4j.CreateConnection(&connection.From, &connection.To)
-	if err != nil {
-		return err1
-	}
+	//if err != nil {
+	//	return err1
+	//}
 	service.store.Delete(connectionId)
 	return nil
 }
 
 func (service *ConnectionService) DeleteConnection(usernameFrom, usernameTo string) error {
-	user, err := service.userStore.GetActiveByUsername(usernameTo)
-	if err != nil {
-		return err
-	}
-	indx := -1
-	for i, connection := range user.Connections {
-		fmt.Printf("Saved connection %s \n", connection)
-		if connection == usernameFrom {
-			indx = i
-			break
-		}
-	}
-	fmt.Printf("Index %d \n", indx)
-	if indx == -1 {
-		return nil
-	}
+	//user, err := service.userStore.GetActiveByUsername(usernameTo)
+	//if err != nil {
+	//	return err
+	//}
+	//indx := -1
+	//for i, connection := range user.Connections {
+	//	fmt.Printf("Saved connection %s \n", connection)
+	//	if connection == usernameFrom {
+	//		indx = i
+	//		break
+	//	}
+	//}
+	//fmt.Printf("Index %d \n", indx)
+	//if indx == -1 {
+	//	return nil
+	//}
 	//TODO delete connection between users
-	userFrom, err := service.userStore.GetActiveByUsername(usernameFrom)
-	service.connectionNeo4j.DeleteConnection(userFrom.Username, user.Username)
+	//userFrom, err := service.userStore.GetActiveByUsername(usernameFrom)
+	service.connectionNeo4j.DeleteConnection(usernameFrom, usernameTo)
 
-	user.Connections[indx] = user.Connections[len(user.Connections)-1]
-	user.Connections = user.Connections[:len(user.Connections)-1]
-	err = service.userStore.Update(user)
-	if err != nil {
-		return err
-	}
+	//user.Connections[indx] = user.Connections[len(user.Connections)-1]
+	//user.Connections = user.Connections[:len(user.Connections)-1]
+	//err = service.userStore.Update(user)
+	//if err != nil {
+	//	return err
+	//}
 	return nil
 }
 

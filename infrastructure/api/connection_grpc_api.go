@@ -56,13 +56,6 @@ func (handler *ConnectionHandler) DeleteConnectionRequest(ctx context.Context, r
 }
 
 func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request *pb.ConnectionBody) (*pb.ConnectionResponse, error) {
-	//fmt.Printf("Request: %s, id to: %s\n", request.Connection.IdFrom, request.Connection.IdTo)
-	//idFrom, err := primitive.ObjectIDFromHex(request.Connection.IdFrom)
-	//idTo, err1 := primitive.ObjectIDFromHex(request.Connection.IdTo)
-	//fmt.Printf("Id from: %s, id to: %s\n", idFrom, idTo)
-	//if err != nil || err1 != nil {
-	//	return nil, err
-	//}
 	usernameFrom := request.Connection.UsernameFrom
 	usernameTo := request.Connection.UsernameTo
 	err := handler.service.DeleteConnection(usernameFrom, usernameTo)
@@ -73,12 +66,6 @@ func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request 
 }
 
 func (handler *ConnectionHandler) RequestConnection(ctx context.Context, request *pb.ConnectionBody) (*pb.ConnectionResponse, error) {
-	//idFrom, err := primitive.ObjectIDFromHex(request.Connection.IdFrom)
-	//idTo, err1 := primitive.ObjectIDFromHex(request.Connection.IdTo)
-	//fmt.Printf("Id from: %s, id to: %s\n", idFrom, idTo)
-	//if err != nil || err1 != nil {
-	//	return nil, err
-	//}
 	usernameFrom := request.Connection.UsernameFrom
 	usernameTo := request.Connection.UsernameTo
 	handler.service.RequestConnection(usernameFrom, usernameTo)
