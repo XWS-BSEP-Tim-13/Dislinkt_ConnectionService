@@ -42,6 +42,15 @@ service ConnectionService{
       get: "/conn/user/user-connection-usernames/{username}",
     };
   }
+  rpc CheckIfUserConnected(UserUsername)returns(BoolMessage){
+    option(google.api.http) = {
+      get: "/conn/user/users-connected/{username}",
+    };
+  }
+}
+
+message BoolMessage{
+  bool isConnected=1;
 }
 
 message GetRequest {

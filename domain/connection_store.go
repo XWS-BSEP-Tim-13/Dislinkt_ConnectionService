@@ -10,4 +10,5 @@ type ConnectionStore interface {
 	DeleteAll()
 	GetRequestsForUser(id primitive.ObjectID) ([]*ConnectionRequest, error)
 	Delete(id primitive.ObjectID)
+	CheckIfUsersConnected(usernameFrom, usernameTo string) bool
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/application"
 	pb "github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/grpc/proto"
+	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/jwt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -89,6 +90,21 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 	}
 	if err != nil {
 		return nil, err
+	}
+	return response, nil
+}
+
+func (handler *ConnectionHandler) CheckIfUserConnected(ctx context.Context, request *pb.UserUsername) (*pb.BoolMessage, error) {
+	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
+	if err != nil {
+		response := &pb.BoolMessage{
+			IsConnected: false,
+		}
+		return response, nil
+	}
+	isConnected := handler.service.CheckIfUserConnected(usernameFrom, request.Username)
+	response := &pb.BoolMessage{
+		IsConnected: isConnected,
 	}
 	return response, nil
 }
