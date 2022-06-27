@@ -41,6 +41,7 @@ func (server *Server) Start() {
 	userStore := server.initUserStore(mongoClient)
 	neo4jDriver := server.initNeo4jDriver()
 	neo4jConnectionStore := server.initNeo4jConnectionStore(neo4jDriver)
+	seedConnectionStore(neo4jConnectionStore, userStore)
 	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore)
 	connectionHandler := server.initConnectionHandler(connectionService)
 	server.startGrpcServer(connectionHandler)
@@ -88,6 +89,22 @@ func (server *Server) initNeo4jDriver() neo4j.Driver {
 func (server *Server) initNeo4jConnectionStore(driver neo4j.Driver) persistence.ConnectionNeo4jStore {
 	neo4jConnectionStore := persistence.NewConnectionNeo4jStore(driver)
 	return neo4jConnectionStore
+}
+
+func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore domain.UserStore) {
+	userAna, _ := userStore.GetActiveByUsername("anagavrilovic")
+	userSrki, _ := userStore.GetActiveByUsername("srdjansukovic")
+	userLjuba, _ := userStore.GetActiveByUsername("stefanljubovic")
+	userMarija, _ := userStore.GetActiveByUsername("marijakljestan")
+	userLenka, _ := userStore.GetActiveByUsername("lenka")
+
+	connStore.CreateConnection(userSrki, userAna)
+	connStore.CreateConnection(userAna, userSrki)
+	connStore.CreateConnection(userAna, userLjuba)
+	connStore.CreateConnection(userSrki, userLjuba)
+	connStore.CreateConnection(userLjuba, userMarija)
+	connStore.CreateConnection(userMarija, userAna)
+	connStore.CreateConnection(userLenka, userAna)
 }
 
 func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore) *application.ConnectionService {

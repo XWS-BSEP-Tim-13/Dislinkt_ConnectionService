@@ -118,11 +118,10 @@ func (u *ConnectionNeo4jStore) DeleteConnection(usernameFrom string, usernameTo 
 }
 
 func (u *ConnectionNeo4jStore) persistUserAsNode(tx neo4j.Transaction, user *domain.RegisteredUser) (interface{}, error) {
-	query := "MERGE (:RegisteredUserNode {email: $email, username: $username, experience: $experience})"
+	query := "MERGE (:RegisteredUserNode {email: $email, username: $username})"
 	parameters := map[string]interface{}{
-		"email":      user.Email,
-		"username":   user.Username,
-		"experience": user.Experiences,
+		"email":    user.Email,
+		"username": user.Username,
 	}
 	_, err := tx.Run(query, parameters)
 	return nil, err
