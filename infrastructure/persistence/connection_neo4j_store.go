@@ -174,6 +174,21 @@ func (u *ConnectionNeo4jStore) FindSuggestedConnectionsForUser(username string) 
 	return suggestions, err
 }
 
+func (u *ConnectionNeo4jStore) FindSuggestedJobOffersForUser(username string) (suggestions []string, err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{})
+	defer func() {
+		err = session.Close()
+	}()
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		return u.findSuggestedJobOffersForUser(tx, username)
+	})
+	if result == nil {
+		return nil, err
+	}
+	suggestions = result.([]string)
+	return suggestions, err
+}
+
 func (u *ConnectionNeo4jStore) DeleteConnection(usernameFrom string, usernameTo string) (ret interface{}, err error) {
 	session := u.Driver.NewSession(neo4j.SessionConfig{})
 	defer func() {
@@ -297,6 +312,27 @@ func (u *ConnectionNeo4jStore) findConnectionsByUsername(tx neo4j.Transaction, u
 func (u *ConnectionNeo4jStore) findSuggestedConnectionsForUser(tx neo4j.Transaction, username string) ([]string, error) {
 	records, err := tx.Run(
 		"MATCH (u:RegisteredUserNode {username: $username})-[r1:FOLLOWS]->(connection)-[r2:FOLLOWS]->(connection_of_connection) WHERE NOT connection_of_connection.username = $username RETURN DISTINCT connection_of_connection.username as usernameRet",
+		map[string]interface{}{
+			"username": username,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []string
+	for records.Next() {
+		record := records.Record()
+		username2, _ := record.Get("usernameRet")
+		results = append(results, username2.(string))
+	}
+
+	return results, nil
+}
+
+func (u *ConnectionNeo4jStore) findSuggestedJobOffersForUser(tx neo4j.Transaction, username string) (interface{}, error) {
+	records, err := tx.Run(
+		"MATCH (u:RegisteredUserNode {username: $username})-[r1:HAS_SKILL]->(skill)<-[r2:REQUIRES_SKILL]-(jobOffer) RETURN DISTINCT jobOffer as ret",
 		map[string]interface{}{
 			"username": username,
 		},
