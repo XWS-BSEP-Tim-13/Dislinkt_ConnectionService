@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	FOLLOW_CONNECTION = "FOLLOWS"
+	FOLLOW_CONNECTION   = "FOLLOWS"
+	USER_SKILL_RELATION = "HAS_SKILL"
 )
 
 type ConnectionNeo4jStore struct {
@@ -19,23 +20,6 @@ func NewConnectionNeo4jStore(driver neo4j.Driver) ConnectionNeo4jStore {
 		Driver: driver,
 	}
 }
-
-/*
-func  (u *ConnectionNeo4jStore) InitConnections() (err error) {
-	session := u.Driver.NewSession(neo4j.SessionConfig{
-		AccessMode: neo4j.AccessModeWrite,
-	})
-	defer func() {
-		err = session.Close()
-	}()
-
-	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
-		return u.persistUserAsNode(tx, toUser)
-	}); err != nil {
-		fmt.Println(err)
-		return err
-	}
-}*/
 
 func (u *ConnectionNeo4jStore) CreateConnection(toUser *domain.RegisteredUser, fromUser *domain.RegisteredUser) (err error) {
 	session := u.Driver.NewSession(neo4j.SessionConfig{
@@ -62,6 +46,38 @@ func (u *ConnectionNeo4jStore) CreateConnection(toUser *domain.RegisteredUser, f
 	if _, err := session.
 		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 			return u.persistConnectionBetweenUsers(tx, fromUser, toUser)
+		}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *ConnectionNeo4jStore) AddSkillToUser(user *domain.RegisteredUser, skill string) (err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer func() {
+		err = session.Close()
+	}()
+
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		return u.persistUserAsNode(tx, user)
+	}); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if _, err := session.
+		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+			return u.persistSkillAsNode(tx, skill)
+		}); err != nil {
+		return err
+	}
+
+	if _, err := session.
+		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+			return u.persistConnectionBetweenUserAndSkill(tx, user, skill)
 		}); err != nil {
 		return err
 	}
@@ -127,11 +143,30 @@ func (u *ConnectionNeo4jStore) persistUserAsNode(tx neo4j.Transaction, user *dom
 	return nil, err
 }
 
+func (u *ConnectionNeo4jStore) persistSkillAsNode(tx neo4j.Transaction, skill string) (interface{}, error) {
+	query := "MERGE (:SkillNode {name: $name})"
+	parameters := map[string]interface{}{
+		"name": skill,
+	}
+	_, err := tx.Run(query, parameters)
+	return nil, err
+}
+
 func (u *ConnectionNeo4jStore) persistConnectionBetweenUsers(tx neo4j.Transaction, fromUser *domain.RegisteredUser, toUser *domain.RegisteredUser) (interface{}, error) {
 	query := "MATCH (from:RegisteredUserNode), (to:RegisteredUserNode) WHERE from.username = $fromUsername AND to.username = $toUsername CREATE (from)-[r:FOLLOWS]->(to)"
 	parameters := map[string]interface{}{
 		"fromUsername": fromUser.Username,
 		"toUsername":   toUser.Username,
+	}
+	_, err := tx.Run(query, parameters)
+	return nil, err
+}
+
+func (u *ConnectionNeo4jStore) persistConnectionBetweenUserAndSkill(tx neo4j.Transaction, user *domain.RegisteredUser, skill string) (interface{}, error) {
+	query := "MATCH (u:RegisteredUserNode), (s:SkillNode) WHERE u.username = $user AND s.name = $skill CREATE (u)-[r:HAS_SKILL]->(s)"
+	parameters := map[string]interface{}{
+		"user":  user.Username,
+		"skill": skill,
 	}
 	_, err := tx.Run(query, parameters)
 	return nil, err

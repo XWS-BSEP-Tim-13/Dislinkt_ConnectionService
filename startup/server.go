@@ -105,6 +105,10 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 	connStore.CreateConnection(userLjuba, userMarija)
 	connStore.CreateConnection(userMarija, userAna)
 	connStore.CreateConnection(userLenka, userAna)
+
+	connStore.AddSkillToUser(userMarija, "AWS")
+	fmt.Println("123")
+	connStore.AddSkillToUser(userMarija, "Docker")
 }
 
 func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore) *application.ConnectionService {
