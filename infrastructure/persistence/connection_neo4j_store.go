@@ -6,11 +6,6 @@ import (
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 )
 
-const (
-	FOLLOW_CONNECTION   = "FOLLOWS"
-	USER_SKILL_RELATION = "HAS_SKILL"
-)
-
 type ConnectionNeo4jStore struct {
 	Driver neo4j.Driver
 }
@@ -268,7 +263,7 @@ func (u *ConnectionNeo4jStore) persistConnectionBetweenCompanyAndJobOffer(tx neo
 }
 
 func (u *ConnectionNeo4jStore) persistConnectionBetweenRequiredSkillAndJobOffer(tx neo4j.Transaction, skill string, offer *domain.JobOffer) (interface{}, error) {
-	query := "MATCH (s:SkillNode), (j:JobOfferNode) WHERE s.name = $skill AND j.position = $position AND j.company = $company CREATE (c)-[r:REQUIRES_SKILL]->(j)"
+	query := "MATCH (j:JobOfferNode), (s:SkillNode) WHERE j.position = $position AND j.company = $company AND s.name = $skill CREATE (j)-[r:REQUIRES_SKILL]->(s)"
 	parameters := map[string]interface{}{
 		"skill":    skill,
 		"position": offer.Position,

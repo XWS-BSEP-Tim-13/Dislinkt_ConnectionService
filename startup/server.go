@@ -112,6 +112,10 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 
 	connStore.AddJobOfferFromCompany(companies[0], jobs[1])
 	connStore.AddJobOfferFromCompany(companies[1], jobs[0])
+
+	connStore.AddRequiredSkillToJobOffer("AWS", jobs[0])
+	connStore.AddRequiredSkillToJobOffer("Docker", jobs[0])
+	connStore.AddRequiredSkillToJobOffer("Java", jobs[1])
 }
 
 func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore) *application.ConnectionService {
