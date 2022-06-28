@@ -80,6 +80,38 @@ func (u *ConnectionNeo4jStore) AddSkillToUser(user *domain.RegisteredUser, skill
 	return nil
 }
 
+func (u *ConnectionNeo4jStore) AddExperienceToUser(user *domain.RegisteredUser, experience *domain.Experience) (err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer func() {
+		err = session.Close()
+	}()
+
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		return u.persistUserAsNode(tx, user)
+	}); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if _, err := session.
+		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+			return u.persistExperienceAsNode(tx, experience)
+		}); err != nil {
+		return err
+	}
+
+	if _, err := session.
+		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+			return u.persistConnectionBetweenUserAndExperience(tx, user, experience)
+		}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (u *ConnectionNeo4jStore) AddJobOfferFromCompany(company *domain.Company, jobOffer *domain.JobOffer) (err error) {
 	session := u.Driver.NewSession(neo4j.SessionConfig{
 		AccessMode: neo4j.AccessModeWrite,
@@ -174,13 +206,13 @@ func (u *ConnectionNeo4jStore) FindSuggestedConnectionsForUser(username string) 
 	return suggestions, err
 }
 
-func (u *ConnectionNeo4jStore) FindSuggestedJobOffersForUser(username string) (suggestions []string, err error) {
+func (u *ConnectionNeo4jStore) FindSuggestedJobOffersBasedOnUserSkills(username string) (suggestions []string, err error) {
 	session := u.Driver.NewSession(neo4j.SessionConfig{})
 	defer func() {
 		err = session.Close()
 	}()
 	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
-		return u.findSuggestedJobOffersForUser(tx, username)
+		return u.findSuggestedJobOffersBasedOnUserSkills(tx, username)
 	})
 	if result == nil {
 		return nil, err
@@ -226,6 +258,16 @@ func (u *ConnectionNeo4jStore) persistSkillAsNode(tx neo4j.Transaction, skill st
 	return nil, err
 }
 
+func (u *ConnectionNeo4jStore) persistExperienceAsNode(tx neo4j.Transaction, experience *domain.Experience) (interface{}, error) {
+	query := "MERGE (:ExperienceNode {position: $position, company: $company})"
+	parameters := map[string]interface{}{
+		"position": experience.Title,
+		"company":  experience.CompanyName,
+	}
+	_, err := tx.Run(query, parameters)
+	return nil, err
+}
+
 func (u *ConnectionNeo4jStore) persistCompanyAsNode(tx neo4j.Transaction, company *domain.Company) (interface{}, error) {
 	query := "MERGE (:CompanyNode {name: $name, username: $username, industry: $industry})"
 	parameters := map[string]interface{}{
@@ -262,6 +304,17 @@ func (u *ConnectionNeo4jStore) persistConnectionBetweenUserAndSkill(tx neo4j.Tra
 	parameters := map[string]interface{}{
 		"user":  user.Username,
 		"skill": skill,
+	}
+	_, err := tx.Run(query, parameters)
+	return nil, err
+}
+
+func (u *ConnectionNeo4jStore) persistConnectionBetweenUserAndExperience(tx neo4j.Transaction, user *domain.RegisteredUser, experience *domain.Experience) (interface{}, error) {
+	query := "MATCH (u:RegisteredUserNode), (e:ExperienceNode) WHERE u.username = $user AND e.position = $position AND e.company = $company CREATE (u)-[r:HAS_EXPERIENCE]->(e)"
+	parameters := map[string]interface{}{
+		"user":     user.Username,
+		"position": experience.Title,
+		"company":  experience.CompanyName,
 	}
 	_, err := tx.Run(query, parameters)
 	return nil, err
@@ -330,7 +383,7 @@ func (u *ConnectionNeo4jStore) findSuggestedConnectionsForUser(tx neo4j.Transact
 	return results, nil
 }
 
-func (u *ConnectionNeo4jStore) findSuggestedJobOffersForUser(tx neo4j.Transaction, username string) (interface{}, error) {
+func (u *ConnectionNeo4jStore) findSuggestedJobOffersBasedOnUserSkills(tx neo4j.Transaction, username string) (interface{}, error) {
 	records, err := tx.Run(
 		"MATCH (u:RegisteredUserNode {username: $username})-[r1:HAS_SKILL]->(skill)<-[r2:REQUIRES_SKILL]-(jobOffer) RETURN DISTINCT jobOffer as ret",
 		map[string]interface{}{
@@ -341,11 +394,11 @@ func (u *ConnectionNeo4jStore) findSuggestedJobOffersForUser(tx neo4j.Transactio
 		return nil, err
 	}
 
-	var results []string
+	var results []interface{}
 	for records.Next() {
 		record := records.Record()
-		username2, _ := record.Get("usernameRet")
-		results = append(results, username2.(string))
+		ret, _ := record.Get("ret")
+		results = append(results, ret)
 	}
 
 	return results, nil

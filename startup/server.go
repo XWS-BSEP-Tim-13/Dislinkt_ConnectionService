@@ -110,6 +110,9 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 	connStore.AddSkillToUser(userMarija, "AWS")
 	connStore.AddSkillToUser(userMarija, "Docker")
 
+	connStore.AddExperienceToUser(userMarija, &userMarija.Experiences[0])
+	connStore.AddExperienceToUser(userMarija, &userMarija.Experiences[1])
+
 	connStore.AddJobOfferFromCompany(companies[0], jobs[1])
 	connStore.AddJobOfferFromCompany(companies[1], jobs[0])
 
