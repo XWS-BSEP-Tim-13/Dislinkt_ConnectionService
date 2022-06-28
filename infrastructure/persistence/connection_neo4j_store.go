@@ -21,7 +21,7 @@ func NewConnectionNeo4jStore(driver neo4j.Driver) ConnectionNeo4jStore {
 	}
 }
 
-func (u *ConnectionNeo4jStore) CreateConnection(toUser *domain.RegisteredUser, fromUser *domain.RegisteredUser) (err error) {
+func (u *ConnectionNeo4jStore) CreateConnectionBetweenUsers(toUser *domain.RegisteredUser, fromUser *domain.RegisteredUser) (err error) {
 	session := u.Driver.NewSession(neo4j.SessionConfig{
 		AccessMode: neo4j.AccessModeWrite,
 	})
@@ -78,6 +78,70 @@ func (u *ConnectionNeo4jStore) AddSkillToUser(user *domain.RegisteredUser, skill
 	if _, err := session.
 		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 			return u.persistConnectionBetweenUserAndSkill(tx, user, skill)
+		}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *ConnectionNeo4jStore) AddJobOfferFromCompany(company *domain.Company, jobOffer *domain.JobOffer) (err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer func() {
+		err = session.Close()
+	}()
+
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		return u.persistCompanyAsNode(tx, company)
+	}); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if _, err := session.
+		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+			return u.persistJobOfferAsNode(tx, jobOffer)
+		}); err != nil {
+		return err
+	}
+
+	if _, err := session.
+		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+			return u.persistConnectionBetweenCompanyAndJobOffer(tx, company, jobOffer)
+		}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *ConnectionNeo4jStore) AddRequiredSkillToJobOffer(skill string, jobOffer *domain.JobOffer) (err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer func() {
+		err = session.Close()
+	}()
+
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		return u.persistSkillAsNode(tx, skill)
+	}); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if _, err := session.
+		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+			return u.persistJobOfferAsNode(tx, jobOffer)
+		}); err != nil {
+		return err
+	}
+
+	if _, err := session.
+		WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+			return u.persistConnectionBetweenRequiredSkillAndJobOffer(tx, skill, jobOffer)
 		}); err != nil {
 		return err
 	}
@@ -152,6 +216,27 @@ func (u *ConnectionNeo4jStore) persistSkillAsNode(tx neo4j.Transaction, skill st
 	return nil, err
 }
 
+func (u *ConnectionNeo4jStore) persistCompanyAsNode(tx neo4j.Transaction, company *domain.Company) (interface{}, error) {
+	query := "MERGE (:CompanyNode {name: $name, username: $username, industry: $industry})"
+	parameters := map[string]interface{}{
+		"name":     company.CompanyName,
+		"username": company.Username,
+		"industry": company.Industry,
+	}
+	_, err := tx.Run(query, parameters)
+	return nil, err
+}
+
+func (u *ConnectionNeo4jStore) persistJobOfferAsNode(tx neo4j.Transaction, offer *domain.JobOffer) (interface{}, error) {
+	query := "MERGE (:JobOfferNode {position: $position, company: $company})"
+	parameters := map[string]interface{}{
+		"position": offer.Position,
+		"company":  offer.Company.Username,
+	}
+	_, err := tx.Run(query, parameters)
+	return nil, err
+}
+
 func (u *ConnectionNeo4jStore) persistConnectionBetweenUsers(tx neo4j.Transaction, fromUser *domain.RegisteredUser, toUser *domain.RegisteredUser) (interface{}, error) {
 	query := "MATCH (from:RegisteredUserNode), (to:RegisteredUserNode) WHERE from.username = $fromUsername AND to.username = $toUsername CREATE (from)-[r:FOLLOWS]->(to)"
 	parameters := map[string]interface{}{
@@ -167,6 +252,27 @@ func (u *ConnectionNeo4jStore) persistConnectionBetweenUserAndSkill(tx neo4j.Tra
 	parameters := map[string]interface{}{
 		"user":  user.Username,
 		"skill": skill,
+	}
+	_, err := tx.Run(query, parameters)
+	return nil, err
+}
+
+func (u *ConnectionNeo4jStore) persistConnectionBetweenCompanyAndJobOffer(tx neo4j.Transaction, company *domain.Company, offer *domain.JobOffer) (interface{}, error) {
+	query := "MATCH (c:CompanyNode), (j:JobOfferNode) WHERE c.username = $company AND j.position = $position AND j.company = $company CREATE (c)-[r:OFFERS_JOB]->(j)"
+	parameters := map[string]interface{}{
+		"company":  company.Username,
+		"position": offer.Position,
+	}
+	_, err := tx.Run(query, parameters)
+	return nil, err
+}
+
+func (u *ConnectionNeo4jStore) persistConnectionBetweenRequiredSkillAndJobOffer(tx neo4j.Transaction, skill string, offer *domain.JobOffer) (interface{}, error) {
+	query := "MATCH (s:SkillNode), (j:JobOfferNode) WHERE s.name = $skill AND j.position = $position AND j.company = $company CREATE (c)-[r:REQUIRES_SKILL]->(j)"
+	parameters := map[string]interface{}{
+		"skill":    skill,
+		"position": offer.Position,
+		"company":  offer.Company.Username,
 	}
 	_, err := tx.Run(query, parameters)
 	return nil, err

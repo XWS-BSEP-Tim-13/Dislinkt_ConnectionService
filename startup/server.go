@@ -59,7 +59,7 @@ func (server *Server) initConnectionStore(client *mongo.Client) domain.Connectio
 	store := persistence.NewConnectionMongoDBStore(client)
 	store.DeleteAll()
 
-	for _, connection := range connections {
+	for _, connection := range connectionRequests {
 		err := store.Insert(connection)
 		if err != nil {
 			log.Fatal(err)
@@ -98,17 +98,20 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 	userMarija, _ := userStore.GetActiveByUsername("marijakljestan")
 	userLenka, _ := userStore.GetActiveByUsername("lenka")
 
-	connStore.CreateConnection(userSrki, userAna)
-	connStore.CreateConnection(userAna, userSrki)
-	connStore.CreateConnection(userAna, userLjuba)
-	connStore.CreateConnection(userSrki, userLjuba)
-	connStore.CreateConnection(userLjuba, userMarija)
-	connStore.CreateConnection(userMarija, userAna)
-	connStore.CreateConnection(userLenka, userAna)
+	connStore.CreateConnectionBetweenUsers(userSrki, userAna)
+	connStore.CreateConnectionBetweenUsers(userAna, userSrki)
+	connStore.CreateConnectionBetweenUsers(userSrki, userLjuba)
+	connStore.CreateConnectionBetweenUsers(userLjuba, userMarija)
+	connStore.CreateConnectionBetweenUsers(userMarija, userAna)
+	connStore.CreateConnectionBetweenUsers(userLenka, userAna)
 
+	connStore.AddSkillToUser(userAna, "Java")
+	connStore.AddSkillToUser(userAna, "Docker")
 	connStore.AddSkillToUser(userMarija, "AWS")
-	fmt.Println("123")
 	connStore.AddSkillToUser(userMarija, "Docker")
+
+	connStore.AddJobOfferFromCompany(companies[0], jobs[1])
+	connStore.AddJobOfferFromCompany(companies[1], jobs[0])
 }
 
 func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore) *application.ConnectionService {

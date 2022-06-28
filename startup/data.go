@@ -208,7 +208,7 @@ var users = []*domain.RegisteredUser{
 	},
 }
 
-var connections = []*domain.ConnectionRequest{
+var connectionRequests = []*domain.ConnectionRequest{
 	{
 		Id: getObjectId("62b89e802697fd8b2ce82138"),
 		From: domain.RegisteredUser{
@@ -248,6 +248,56 @@ var connections = []*domain.ConnectionRequest{
 			Connections: []string{"marijakljestan", "anagavrilovic", "srdjansukovic"},
 		},
 		RequestTime: time.Time{},
+	},
+}
+
+var companies = []*domain.Company{
+	{
+		Id:          getObjectId("623b0cc3a34d25d8567f9f82"),
+		CompanyName: "Levi9",
+		Username:    "levi9",
+		Email:       "levi9@levi9.com",
+		PhoneNumber: "0651234567",
+		Location:    "ns",
+		Description: "Technology services",
+		Website:     "www.levi9.com",
+		CompanySize: "1000",
+		Industry:    "IT",
+		IsActive:    true,
+	},
+	{
+		Id:          getObjectId("623b0cc3a34d25d8567f9f83"),
+		CompanyName: "Symphony",
+		Username:    "Symphony",
+		Email:       "symphony@symphony.com",
+		PhoneNumber: "06517654321",
+		Location:    "ns",
+		Description: "Technology services",
+		Website:     "www.symphony.com",
+		CompanySize: "1000",
+		Industry:    "IT",
+		IsActive:    true,
+	},
+}
+
+var jobs = []*domain.JobOffer{
+	{
+		Id:             getObjectId("623b0cc3a34d25d8567f9f92"),
+		EmploymentType: 0,
+		Position:       "DevOps Engineer",
+		Prerequisites:  "2 years of expirience.",
+		Company:        *companies[1],
+		JobDescription: "Great expirience for self development and work with experts",
+		Published:      time.Now().Add(24 * time.Hour),
+	},
+	{
+		Id:             getObjectId("623b0cc3a34d25d8567f9f93"),
+		EmploymentType: 0,
+		Position:       "Full stack Engineer",
+		Prerequisites:  "2 years of expirience.",
+		Company:        *companies[0],
+		JobDescription: "Great expirience for self development and work with experts",
+		Published:      time.Now().Add(24 * time.Hour),
 	},
 }
 

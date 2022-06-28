@@ -39,7 +39,7 @@ func (service *ConnectionService) RequestConnection(usernameFrom, usernameTo str
 	} else {
 		toUser.Connections = append(toUser.Connections, usernameFrom)
 		service.userStore.Update(toUser)
-		service.connectionNeo4j.CreateConnection(toUser, fromUser)
+		service.connectionNeo4j.CreateConnectionBetweenUsers(toUser, fromUser)
 	}
 	fmt.Printf("Saved to db: \n")
 	return nil
@@ -63,7 +63,7 @@ func (service *ConnectionService) AcceptConnection(connectionId primitive.Object
 	connection.To.Connections = append(connection.To.Connections, connection.From.Username)
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
 	//err1 := service.userStore.Update(&connection.To)
-	service.connectionNeo4j.CreateConnection(&connection.From, &connection.To)
+	service.connectionNeo4j.CreateConnectionBetweenUsers(&connection.From, &connection.To)
 	//if err != nil {
 	//	return err1
 	//}
