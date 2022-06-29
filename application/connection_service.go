@@ -62,42 +62,13 @@ func (service *ConnectionService) AcceptConnection(connectionId primitive.Object
 	}
 	connection.To.Connections = append(connection.To.Connections, connection.From.Username)
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
-	//err1 := service.userStore.Update(&connection.To)
 	service.connectionNeo4j.CreateConnectionBetweenUsers(&connection.From, &connection.To)
-	//if err != nil {
-	//	return err1
-	//}
 	service.store.Delete(connectionId)
 	return nil
 }
 
 func (service *ConnectionService) DeleteConnection(usernameFrom, usernameTo string) error {
-	//user, err := service.userStore.GetActiveByUsername(usernameTo)
-	//if err != nil {
-	//	return err
-	//}
-	//indx := -1
-	//for i, connection := range user.Connections {
-	//	fmt.Printf("Saved connection %s \n", connection)
-	//	if connection == usernameFrom {
-	//		indx = i
-	//		break
-	//	}
-	//}
-	//fmt.Printf("Index %d \n", indx)
-	//if indx == -1 {
-	//	return nil
-	//}
-	//TODO delete connection between users
-	//userFrom, err := service.userStore.GetActiveByUsername(usernameFrom)
 	service.connectionNeo4j.DeleteConnection(usernameFrom, usernameTo)
-
-	//user.Connections[indx] = user.Connections[len(user.Connections)-1]
-	//user.Connections = user.Connections[:len(user.Connections)-1]
-	//err = service.userStore.Update(user)
-	//if err != nil {
-	//	return err
-	//}
 	return nil
 }
 
@@ -116,6 +87,16 @@ func (service *ConnectionService) GetSuggestedConnectionUsernamesForUser(usernam
 	connections, _ := service.connectionNeo4j.FindSuggestedConnectionsForUser(username)
 	for _, connUsername := range connections {
 		retVal = append(retVal, connUsername)
+	}
+
+	return retVal, nil
+}
+
+func (service *ConnectionService) SuggestJobOffersBasedOnUserSkills(username string) ([]*domain.JobOffer, interface{}) {
+	var retVal []*domain.JobOffer
+	jobOffers, _ := service.connectionNeo4j.FindSuggestedJobOffersBasedOnUserSkills(username)
+	for _, jobOffer := range jobOffers {
+		retVal = append(retVal, jobOffer)
 	}
 
 	return retVal, nil

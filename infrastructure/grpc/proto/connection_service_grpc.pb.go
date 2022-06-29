@@ -29,6 +29,7 @@ type ConnectionServiceClient interface {
 	RequestConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	GetConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
 	GetSuggestedConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
+	FindJobOffersBasedOnUserSkills(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*JobOffers, error)
 }
 
 type connectionServiceClient struct {
@@ -102,6 +103,15 @@ func (c *connectionServiceClient) GetSuggestedConnectionUsernamesForUser(ctx con
 	return out, nil
 }
 
+func (c *connectionServiceClient) FindJobOffersBasedOnUserSkills(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*JobOffers, error) {
+	out := new(JobOffers)
+	err := c.cc.Invoke(ctx, "/connection.ConnectionService/FindJobOffersBasedOnUserSkills", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConnectionServiceServer is the server API for ConnectionService service.
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
@@ -113,6 +123,7 @@ type ConnectionServiceServer interface {
 	RequestConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
 	GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
 	GetSuggestedConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
+	FindJobOffersBasedOnUserSkills(context.Context, *UserUsername) (*JobOffers, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -140,6 +151,9 @@ func (UnimplementedConnectionServiceServer) GetConnectionUsernamesForUser(contex
 }
 func (UnimplementedConnectionServiceServer) GetSuggestedConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSuggestedConnectionUsernamesForUser not implemented")
+}
+func (UnimplementedConnectionServiceServer) FindJobOffersBasedOnUserSkills(context.Context, *UserUsername) (*JobOffers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindJobOffersBasedOnUserSkills not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
@@ -280,6 +294,24 @@ func _ConnectionService_GetSuggestedConnectionUsernamesForUser_Handler(srv inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_FindJobOffersBasedOnUserSkills_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserUsername)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).FindJobOffersBasedOnUserSkills(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection.ConnectionService/FindJobOffersBasedOnUserSkills",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).FindJobOffersBasedOnUserSkills(ctx, req.(*UserUsername))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConnectionService_ServiceDesc is the grpc.ServiceDesc for ConnectionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -314,6 +346,10 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSuggestedConnectionUsernamesForUser",
 			Handler:    _ConnectionService_GetSuggestedConnectionUsernamesForUser_Handler,
+		},
+		{
+			MethodName: "FindJobOffersBasedOnUserSkills",
+			Handler:    _ConnectionService_FindJobOffersBasedOnUserSkills_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

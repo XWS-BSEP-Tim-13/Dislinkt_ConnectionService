@@ -20,10 +20,6 @@ func NewCompanyHandler(service *application.ConnectionService) *ConnectionHandle
 }
 
 func (handler *ConnectionHandler) GetRequestsForUser(ctx context.Context, request *pb.GetRequestUsername) (*pb.ConnectionRequests, error) {
-	//id, err := primitive.ObjectIDFromHex(request.Id)
-	//if err != nil {
-	//	return nil, err
-	//}
 	username := request.Username
 	requests, _ := handler.service.GetRequestsForUser(username)
 	response := &pb.ConnectionRequests{
@@ -94,5 +90,19 @@ func (handler *ConnectionHandler) GetSuggestedConnectionUsernamesForUser(ctx con
 	if err != nil {
 		return nil, err
 	}
+	return response, nil
+}
+
+func (handler *ConnectionHandler) FindJobOffersBasedOnUserSkills(ctx context.Context, request *pb.UserUsername) (*pb.JobOffers, error) {
+	jobOffers, _ := handler.service.SuggestJobOffersBasedOnUserSkills(request.Username)
+	response := &pb.JobOffers{
+		JobOffers: []*pb.JobOffer{},
+	}
+
+	for _, jobOffer := range jobOffers {
+		current := mapJobOfferToPB(jobOffer)
+		response.JobOffers = append(response.JobOffers, current)
+	}
+
 	return response, nil
 }

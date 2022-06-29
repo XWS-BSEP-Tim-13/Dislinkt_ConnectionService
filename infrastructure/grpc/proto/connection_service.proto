@@ -47,6 +47,12 @@ service ConnectionService{
       get: "/conn/user/suggested-connection-usernames/{username}",
     };
   }
+
+  rpc FindJobOffersBasedOnUserSkills(UserUsername) returns(JobOffers){
+    option(google.api.http) = {
+      get: "/conn/suggest-job-offers/{username}",
+    };
+  }
 }
 
 message GetRequest {
@@ -87,6 +93,10 @@ message JobOffer {
   string prerequisites = 4;
   Company company = 5;
   EmploymentType employment_type=6;
+}
+
+message JobOffers {
+  repeated JobOffer jobOffers = 1;
 }
 
 enum EmploymentType {

@@ -206,7 +206,7 @@ func (u *ConnectionNeo4jStore) FindSuggestedConnectionsForUser(username string) 
 	return suggestions, err
 }
 
-func (u *ConnectionNeo4jStore) FindSuggestedJobOffersBasedOnUserSkills(username string) (suggestions []string, err error) {
+func (u *ConnectionNeo4jStore) FindSuggestedJobOffersBasedOnUserSkills(username string) (jobOffers []*domain.JobOffer, err error) {
 	session := u.Driver.NewSession(neo4j.SessionConfig{})
 	defer func() {
 		err = session.Close()
@@ -217,7 +217,7 @@ func (u *ConnectionNeo4jStore) FindSuggestedJobOffersBasedOnUserSkills(username 
 	if result == nil {
 		return nil, err
 	}
-	suggestions = result.([]string)
+	suggestions := result.([]*domain.JobOffer)
 	return suggestions, err
 }
 
@@ -280,10 +280,12 @@ func (u *ConnectionNeo4jStore) persistCompanyAsNode(tx neo4j.Transaction, compan
 }
 
 func (u *ConnectionNeo4jStore) persistJobOfferAsNode(tx neo4j.Transaction, offer *domain.JobOffer) (interface{}, error) {
-	query := "MERGE (:JobOfferNode {position: $position, company: $company})"
+	query := "MERGE (:JobOfferNode {position: $position, company: $company, description: $description, type: $type})"
 	parameters := map[string]interface{}{
-		"position": offer.Position,
-		"company":  offer.Company.Username,
+		"position":    offer.Position,
+		"company":     offer.Company.Username,
+		"description": offer.JobDescription,
+		"type":        offer.EmploymentType,
 	}
 	_, err := tx.Run(query, parameters)
 	return nil, err
@@ -383,9 +385,9 @@ func (u *ConnectionNeo4jStore) findSuggestedConnectionsForUser(tx neo4j.Transact
 	return results, nil
 }
 
-func (u *ConnectionNeo4jStore) findSuggestedJobOffersBasedOnUserSkills(tx neo4j.Transaction, username string) (interface{}, error) {
+func (u *ConnectionNeo4jStore) findSuggestedJobOffersBasedOnUserSkills(tx neo4j.Transaction, username string) ([]*domain.JobOffer, error) {
 	records, err := tx.Run(
-		"MATCH (u:RegisteredUserNode {username: $username})-[r1:HAS_SKILL]->(skill)<-[r2:REQUIRES_SKILL]-(jobOffer) RETURN DISTINCT jobOffer as ret",
+		"MATCH (u:RegisteredUserNode {username: $username})-[r1:HAS_SKILL]->(skill)<-[r2:REQUIRES_SKILL]-(jobOffer) RETURN DISTINCT jobOffer as job",
 		map[string]interface{}{
 			"username": username,
 		},
@@ -394,12 +396,14 @@ func (u *ConnectionNeo4jStore) findSuggestedJobOffersBasedOnUserSkills(tx neo4j.
 		return nil, err
 	}
 
-	var results []interface{}
+	var jobOffers = []*domain.JobOffer{}
 	for records.Next() {
 		record := records.Record()
-		ret, _ := record.Get("ret")
-		results = append(results, ret)
+		job, _ := record.Get("job")
+		jobOffer := job.(*domain.JobOffer)
+		//skill, _ := record.Get("skill")
+		jobOffers = append(jobOffers, jobOffer)
 	}
 
-	return results, nil
+	return jobOffers, nil
 }
