@@ -20,12 +20,9 @@ func NewCompanyHandler(service *application.ConnectionService) *ConnectionHandle
 	}
 }
 
-func (handler *ConnectionHandler) GetRequestsForUser(ctx context.Context, request *pb.GetRequest) (*pb.ConnectionRequests, error) {
-	id, err := primitive.ObjectIDFromHex(request.Id)
-	if err != nil {
-		return nil, err
-	}
-	requests, err := handler.service.GetRequestsForUser(id)
+func (handler *ConnectionHandler) GetRequestsForUser(ctx context.Context, request *pb.GetRequestUsername) (*pb.ConnectionRequests, error) {
+	username := request.Username
+	requests, _ := handler.service.GetRequestsForUser(username)
 	response := &pb.ConnectionRequests{
 		Requests: []*pb.ConnectionRequest{},
 	}
@@ -56,14 +53,9 @@ func (handler *ConnectionHandler) DeleteConnectionRequest(ctx context.Context, r
 }
 
 func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request *pb.ConnectionBody) (*pb.ConnectionResponse, error) {
-	fmt.Printf("Request: %s, id to: %s\n", request.Connection.IdFrom, request.Connection.IdTo)
-	idFrom, err := primitive.ObjectIDFromHex(request.Connection.IdFrom)
-	idTo, err1 := primitive.ObjectIDFromHex(request.Connection.IdTo)
-	fmt.Printf("Id from: %s, id to: %s\n", idFrom, idTo)
-	if err != nil || err1 != nil {
-		return nil, err
-	}
-	err = handler.service.DeleteConnection(idFrom, idTo)
+	usernameFrom := request.Connection.UsernameFrom
+	usernameTo := request.Connection.UsernameTo
+	err := handler.service.DeleteConnection(usernameFrom, usernameTo)
 	if err != nil {
 		return nil, err
 	}
@@ -71,13 +63,9 @@ func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request 
 }
 
 func (handler *ConnectionHandler) RequestConnection(ctx context.Context, request *pb.ConnectionBody) (*pb.ConnectionResponse, error) {
-	idFrom, err := primitive.ObjectIDFromHex(request.Connection.IdFrom)
-	idTo, err1 := primitive.ObjectIDFromHex(request.Connection.IdTo)
-	fmt.Printf("Id from: %s, id to: %s\n", idFrom, idTo)
-	if err != nil || err1 != nil {
-		return nil, err
-	}
-	handler.service.RequestConnection(idFrom, idTo)
+	usernameFrom := request.Connection.UsernameFrom
+	usernameTo := request.Connection.UsernameTo
+	handler.service.RequestConnection(usernameFrom, usernameTo)
 	fmt.Printf("Returning to func")
 	return new(pb.ConnectionResponse), nil
 }

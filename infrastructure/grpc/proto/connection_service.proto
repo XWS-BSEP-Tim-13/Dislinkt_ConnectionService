@@ -8,9 +8,9 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
 service ConnectionService{
-  rpc GetRequestsForUser(GetRequest) returns(ConnectionRequests){
+  rpc GetRequestsForUser(GetRequestUsername) returns(ConnectionRequests){
     option(google.api.http) = {
-      get: "/conn/connection-request/by-user/{id}"
+      get: "/conn/connection-request/by-user/{username}"
     };
   }
 
@@ -42,24 +42,47 @@ service ConnectionService{
       get: "/conn/user/user-connection-usernames/{username}",
     };
   }
+  rpc GetSuggestedConnectionUsernamesForUser(UserUsername) returns(UserConnectionUsernames){
+    option(google.api.http) = {
+      get: "/conn/user/suggested-connection-usernames/{username}",
+    };
+  }
+
+  rpc FindJobOffersBasedOnUserSkills(UserUsername) returns(JobOffers){
+    option(google.api.http) = {
+      get: "/conn/suggest-job-offers/{username}",
+    };
+  }
+
   rpc CheckIfUserConnected(UserUsername)returns(ConnectionStatusResponse){
     option(google.api.http) = {
       get: "/conn/user/users-connected/{username}",
     };
   }
-  
-}
-
-message BoolMessage{
-  bool isConnected=1;
 }
 
 message GetRequest {
   string id = 1;
 }
 
+message GetRequestUsername {
+  string username = 1;
+}
+
 message GetResponse {
   Company company = 1;
+}
+
+message ConnectionStatusResponse{
+  ConnectionStatus connectionStatus=1;
+}
+
+enum ConnectionStatus {
+  CONNECTED = 0;
+  CONNECTION_REQUEST = 1;
+  NONEE = 2;
+  BLOCKED = 3;
+  BLOCKED_ME =4;
 }
 
 message GetAllRequest {
@@ -90,23 +113,15 @@ message JobOffer {
   EmploymentType employment_type=6;
 }
 
+message JobOffers {
+  repeated JobOffer jobOffers = 1;
+}
+
 enum EmploymentType {
   FULL_TIME = 0;
   PART_TIME = 1;
   INTERNSHIP = 2;
   NONE = 3;
-}
-
-message ConnectionStatusResponse{
-  ConnectionStatus connectionStatus=1;
-}
-
-enum ConnectionStatus {
-  CONNECTED = 0;
-  CONNECTION_REQUEST = 1;
-  NONEE = 2;
-  BLOCKED = 3;
-  BLOCKED_ME =4;
 }
 
 message User {
@@ -190,8 +205,8 @@ message ConnectionBody{
 }
 
 message Connection{
-  string idFrom = 1;
-  string idTo = 2;
+  string usernameFrom = 1;
+  string usernameTo = 2;
 }
 
 message UserUsername{
@@ -201,4 +216,3 @@ message UserUsername{
 message UserConnectionUsernames{
   repeated string usernames = 1;
 }
-

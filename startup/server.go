@@ -41,6 +41,7 @@ func (server *Server) Start() {
 	userStore := server.initUserStore(mongoClient)
 	neo4jDriver := server.initNeo4jDriver()
 	neo4jConnectionStore := server.initNeo4jConnectionStore(neo4jDriver)
+	seedConnectionStore(neo4jConnectionStore, userStore)
 	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore)
 	connectionHandler := server.initConnectionHandler(connectionService)
 	server.startGrpcServer(connectionHandler)
@@ -58,7 +59,7 @@ func (server *Server) initConnectionStore(client *mongo.Client) domain.Connectio
 	store := persistence.NewConnectionMongoDBStore(client)
 	store.DeleteAll()
 
-	for _, connection := range connections {
+	for _, connection := range connectionRequests {
 		err := store.Insert(connection)
 		if err != nil {
 			log.Fatal(err)
@@ -88,6 +89,36 @@ func (server *Server) initNeo4jDriver() neo4j.Driver {
 func (server *Server) initNeo4jConnectionStore(driver neo4j.Driver) persistence.ConnectionNeo4jStore {
 	neo4jConnectionStore := persistence.NewConnectionNeo4jStore(driver)
 	return neo4jConnectionStore
+}
+
+func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore domain.UserStore) {
+	userAna, _ := userStore.GetActiveByUsername("anagavrilovic")
+	userSrki, _ := userStore.GetActiveByUsername("srdjansukovic")
+	userLjuba, _ := userStore.GetActiveByUsername("stefanljubovic")
+	userMarija, _ := userStore.GetActiveByUsername("marijakljestan")
+	userLenka, _ := userStore.GetActiveByUsername("lenka")
+
+	connStore.CreateConnectionBetweenUsers(userSrki, userAna)
+	connStore.CreateConnectionBetweenUsers(userAna, userSrki)
+	connStore.CreateConnectionBetweenUsers(userSrki, userLjuba)
+	connStore.CreateConnectionBetweenUsers(userLjuba, userMarija)
+	connStore.CreateConnectionBetweenUsers(userMarija, userAna)
+	connStore.CreateConnectionBetweenUsers(userLenka, userAna)
+
+	connStore.AddSkillToUser(userAna, "Java")
+	connStore.AddSkillToUser(userAna, "Docker")
+	connStore.AddSkillToUser(userMarija, "AWS")
+	connStore.AddSkillToUser(userMarija, "Docker")
+
+	connStore.AddExperienceToUser(userMarija, &userMarija.Experiences[0])
+	connStore.AddExperienceToUser(userMarija, &userMarija.Experiences[1])
+
+	connStore.AddJobOfferFromCompany(companies[0], jobs[1])
+	connStore.AddJobOfferFromCompany(companies[1], jobs[0])
+
+	connStore.AddRequiredSkillToJobOffer("AWS", jobs[0])
+	connStore.AddRequiredSkillToJobOffer("Docker", jobs[0])
+	connStore.AddRequiredSkillToJobOffer("Java", jobs[1])
 }
 
 func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore) *application.ConnectionService {

@@ -68,7 +68,7 @@ type RegisteredUser struct {
 	Educations   []Education          `bson:"educations"`
 	Skills       []string             `bson:"skills"`
 	Interests    []primitive.ObjectID `bson:"interests"`
-	Connections  []primitive.ObjectID `bson:"connections"`
+	Connections  []string             `bson:"connections"`
 	Username     string               `bson:"username" validate:"required,username"`
 	BlockedUsers []string             `bson:"blocked_users"`
 }

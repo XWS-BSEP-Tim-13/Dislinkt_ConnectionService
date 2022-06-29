@@ -90,7 +90,7 @@ func mapUserToPB(user *domain.RegisteredUser) *pb.User {
 	}
 
 	for _, connection := range user.Connections {
-		userPb.Connections = append(userPb.Connections, connection.Hex())
+		userPb.Connections = append(userPb.Connections, connection)
 	}
 
 	return userPb

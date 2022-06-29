@@ -22,14 +22,15 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ConnectionServiceClient interface {
-	GetRequestsForUser(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ConnectionRequests, error)
+	GetRequestsForUser(ctx context.Context, in *GetRequestUsername, opts ...grpc.CallOption) (*ConnectionRequests, error)
 	AcceptConnectionRequest(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	DeleteConnectionRequest(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	DeleteConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	RequestConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	GetConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
+	GetSuggestedConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
+	FindJobOffersBasedOnUserSkills(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*JobOffers, error)
 	CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error)
-	BlockUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*GetAllRequest, error)
 }
 
 type connectionServiceClient struct {
@@ -40,7 +41,7 @@ func NewConnectionServiceClient(cc grpc.ClientConnInterface) ConnectionServiceCl
 	return &connectionServiceClient{cc}
 }
 
-func (c *connectionServiceClient) GetRequestsForUser(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*ConnectionRequests, error) {
+func (c *connectionServiceClient) GetRequestsForUser(ctx context.Context, in *GetRequestUsername, opts ...grpc.CallOption) (*ConnectionRequests, error) {
 	out := new(ConnectionRequests)
 	err := c.cc.Invoke(ctx, "/connection.ConnectionService/GetRequestsForUser", in, out, opts...)
 	if err != nil {
@@ -94,18 +95,27 @@ func (c *connectionServiceClient) GetConnectionUsernamesForUser(ctx context.Cont
 	return out, nil
 }
 
-func (c *connectionServiceClient) CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error) {
-	out := new(ConnectionStatusResponse)
-	err := c.cc.Invoke(ctx, "/connection.ConnectionService/CheckIfUserConnected", in, out, opts...)
+func (c *connectionServiceClient) GetSuggestedConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error) {
+	out := new(UserConnectionUsernames)
+	err := c.cc.Invoke(ctx, "/connection.ConnectionService/GetSuggestedConnectionUsernamesForUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *connectionServiceClient) BlockUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*GetAllRequest, error) {
-	out := new(GetAllRequest)
-	err := c.cc.Invoke(ctx, "/connection.ConnectionService/BlockUser", in, out, opts...)
+func (c *connectionServiceClient) FindJobOffersBasedOnUserSkills(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*JobOffers, error) {
+	out := new(JobOffers)
+	err := c.cc.Invoke(ctx, "/connection.ConnectionService/FindJobOffersBasedOnUserSkills", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *connectionServiceClient) CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error) {
+	out := new(ConnectionStatusResponse)
+	err := c.cc.Invoke(ctx, "/connection.ConnectionService/CheckIfUserConnected", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,14 +126,15 @@ func (c *connectionServiceClient) BlockUser(ctx context.Context, in *UserUsernam
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
 type ConnectionServiceServer interface {
-	GetRequestsForUser(context.Context, *GetRequest) (*ConnectionRequests, error)
+	GetRequestsForUser(context.Context, *GetRequestUsername) (*ConnectionRequests, error)
 	AcceptConnectionRequest(context.Context, *GetRequest) (*ConnectionResponse, error)
 	DeleteConnectionRequest(context.Context, *GetRequest) (*ConnectionResponse, error)
 	DeleteConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
 	RequestConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
 	GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
+	GetSuggestedConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
+	FindJobOffersBasedOnUserSkills(context.Context, *UserUsername) (*JobOffers, error)
 	CheckIfUserConnected(context.Context, *UserUsername) (*ConnectionStatusResponse, error)
-	BlockUser(context.Context, *UserUsername) (*GetAllRequest, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -131,7 +142,7 @@ type ConnectionServiceServer interface {
 type UnimplementedConnectionServiceServer struct {
 }
 
-func (UnimplementedConnectionServiceServer) GetRequestsForUser(context.Context, *GetRequest) (*ConnectionRequests, error) {
+func (UnimplementedConnectionServiceServer) GetRequestsForUser(context.Context, *GetRequestUsername) (*ConnectionRequests, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRequestsForUser not implemented")
 }
 func (UnimplementedConnectionServiceServer) AcceptConnectionRequest(context.Context, *GetRequest) (*ConnectionResponse, error) {
@@ -149,11 +160,14 @@ func (UnimplementedConnectionServiceServer) RequestConnection(context.Context, *
 func (UnimplementedConnectionServiceServer) GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConnectionUsernamesForUser not implemented")
 }
+func (UnimplementedConnectionServiceServer) GetSuggestedConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSuggestedConnectionUsernamesForUser not implemented")
+}
+func (UnimplementedConnectionServiceServer) FindJobOffersBasedOnUserSkills(context.Context, *UserUsername) (*JobOffers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindJobOffersBasedOnUserSkills not implemented")
+}
 func (UnimplementedConnectionServiceServer) CheckIfUserConnected(context.Context, *UserUsername) (*ConnectionStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckIfUserConnected not implemented")
-}
-func (UnimplementedConnectionServiceServer) BlockUser(context.Context, *UserUsername) (*GetAllRequest, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BlockUser not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
@@ -169,7 +183,7 @@ func RegisterConnectionServiceServer(s grpc.ServiceRegistrar, srv ConnectionServ
 }
 
 func _ConnectionService_GetRequestsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
+	in := new(GetRequestUsername)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -181,7 +195,7 @@ func _ConnectionService_GetRequestsForUser_Handler(srv interface{}, ctx context.
 		FullMethod: "/connection.ConnectionService/GetRequestsForUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectionServiceServer).GetRequestsForUser(ctx, req.(*GetRequest))
+		return srv.(ConnectionServiceServer).GetRequestsForUser(ctx, req.(*GetRequestUsername))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -276,6 +290,42 @@ func _ConnectionService_GetConnectionUsernamesForUser_Handler(srv interface{}, c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_GetSuggestedConnectionUsernamesForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserUsername)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).GetSuggestedConnectionUsernamesForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection.ConnectionService/GetSuggestedConnectionUsernamesForUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).GetSuggestedConnectionUsernamesForUser(ctx, req.(*UserUsername))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ConnectionService_FindJobOffersBasedOnUserSkills_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserUsername)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).FindJobOffersBasedOnUserSkills(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection.ConnectionService/FindJobOffersBasedOnUserSkills",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).FindJobOffersBasedOnUserSkills(ctx, req.(*UserUsername))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ConnectionService_CheckIfUserConnected_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserUsername)
 	if err := dec(in); err != nil {
@@ -290,24 +340,6 @@ func _ConnectionService_CheckIfUserConnected_Handler(srv interface{}, ctx contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConnectionServiceServer).CheckIfUserConnected(ctx, req.(*UserUsername))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConnectionService_BlockUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserUsername)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConnectionServiceServer).BlockUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/connection.ConnectionService/BlockUser",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectionServiceServer).BlockUser(ctx, req.(*UserUsername))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -344,12 +376,16 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ConnectionService_GetConnectionUsernamesForUser_Handler,
 		},
 		{
-			MethodName: "CheckIfUserConnected",
-			Handler:    _ConnectionService_CheckIfUserConnected_Handler,
+			MethodName: "GetSuggestedConnectionUsernamesForUser",
+			Handler:    _ConnectionService_GetSuggestedConnectionUsernamesForUser_Handler,
 		},
 		{
-			MethodName: "BlockUser",
-			Handler:    _ConnectionService_BlockUser_Handler,
+			MethodName: "FindJobOffersBasedOnUserSkills",
+			Handler:    _ConnectionService_FindJobOffersBasedOnUserSkills_Handler,
+		},
+		{
+			MethodName: "CheckIfUserConnected",
+			Handler:    _ConnectionService_CheckIfUserConnected_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

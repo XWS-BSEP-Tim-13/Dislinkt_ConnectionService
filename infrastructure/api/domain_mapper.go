@@ -113,13 +113,9 @@ func mapUserToDomain(userPb *pb.User) *domain.RegisteredUser {
 		user.Interests = append(user.Interests, interestId)
 	}
 
-	user.Connections = []primitive.ObjectID{}
+	user.Connections = []string{}
 	for _, connection := range (*userPb).Connections {
-		connectionId, err := primitive.ObjectIDFromHex(connection)
-		if err != nil {
-			continue
-		}
-		user.Connections = append(user.Connections, connectionId)
+		user.Connections = append(user.Connections, connection)
 	}
 
 	return user

@@ -8,7 +8,7 @@ type ConnectionStore interface {
 	Get(id primitive.ObjectID) (*ConnectionRequest, error)
 	Insert(company *ConnectionRequest) error
 	DeleteAll()
-	GetRequestsForUser(id primitive.ObjectID) ([]*ConnectionRequest, error)
+	GetRequestsForUser(username string) ([]*ConnectionRequest, error)
 	Delete(id primitive.ObjectID)
 	CheckIfUsersConnected(usernameFrom, usernameTo string) bool
 }
