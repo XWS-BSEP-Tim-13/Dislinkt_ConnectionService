@@ -82,6 +82,19 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 	return response, nil
 }
 
+func (handler *ConnectionHandler) BlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
+	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = handler.service.BlockOrchestrator(usernameFrom, request.Username)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllRequest{}
+	return response, nil
+}
+
 func (handler *ConnectionHandler) CheckIfUserConnected(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionStatusResponse, error) {
 	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {

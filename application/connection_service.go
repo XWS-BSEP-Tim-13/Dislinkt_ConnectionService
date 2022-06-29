@@ -13,13 +13,15 @@ type ConnectionService struct {
 	store           domain.ConnectionStore
 	userStore       domain.UserStore
 	connectionNeo4j persistence.ConnectionNeo4jStore
+	orchestrator    *BlockUserOrchestrator
 }
 
-func NewConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4j persistence.ConnectionNeo4jStore) *ConnectionService {
+func NewConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4j persistence.ConnectionNeo4jStore, orchestrator *BlockUserOrchestrator) *ConnectionService {
 	return &ConnectionService{
 		store:           store,
 		userStore:       userStore,
 		connectionNeo4j: neo4j,
+		orchestrator:    orchestrator,
 	}
 }
 
@@ -43,6 +45,15 @@ func (service *ConnectionService) RequestConnection(usernameFrom, usernameTo str
 		service.connectionNeo4j.CreateConnectionBetweenUsers(toUser, fromUser)
 	}
 	fmt.Printf("Saved to db: \n")
+	return nil
+}
+
+func (service *ConnectionService) BlockOrchestrator(usernameFrom, usernameTo string) error {
+	fmt.Println("Orchestrator stared...")
+	err := service.orchestrator.Start(usernameFrom, usernameTo)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -100,6 +111,7 @@ func (service *ConnectionService) AcceptConnection(connectionId primitive.Object
 //}
 
 func (service *ConnectionService) DeleteConnection(usernameFrom, usernameTo string) error {
+	fmt.Println("Delete stared...", usernameTo)
 	service.connectionNeo4j.DeleteConnection(usernameFrom, usernameTo)
 	return nil
 }
@@ -112,6 +124,20 @@ func (service *ConnectionService) GetRequestsForUser(username string) ([]*domain
 	resp, err := service.store.GetRequestsForUser(username)
 	fmt.Printf("Response %d\n", len(resp))
 	return resp, err
+}
+
+func (service *ConnectionService) BlockUser(usernameFrom, usernamteTo string) error {
+	fmt.Println("Block user")
+	user, err := service.userStore.GetByUsername(usernameFrom)
+	if err != nil {
+		return err
+	}
+	user.BlockedUsers = append(user.BlockedUsers, usernamteTo)
+	err = service.userStore.UpdateBlockedList(user)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (service *ConnectionService) CheckIfUserConnected(fromUsername, toUsername string) enum.ConnectionStatus {

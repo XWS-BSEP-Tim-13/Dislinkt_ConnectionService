@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	saga "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging"
+	"github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging/nats"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/application"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/domain"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/api"
@@ -27,6 +29,7 @@ const (
 	serverCertFile = "cert/cert.pem"
 	serverKeyFile  = "cert/key.pem"
 	clientCertFile = "cert/client-cert.pem"
+	QueueGroup     = "block_user"
 )
 
 func NewServer(config *config.Config) *Server {
@@ -42,7 +45,16 @@ func (server *Server) Start() {
 	neo4jDriver := server.initNeo4jDriver()
 	neo4jConnectionStore := server.initNeo4jConnectionStore(neo4jDriver)
 	seedConnectionStore(neo4jConnectionStore, userStore)
-	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore)
+
+	commandPublisher := server.initPublisher(server.config.BlockUserCommandSubject)
+	replySubscriber := server.initSubscriber(server.config.BlockUserReplySubject, QueueGroup)
+	createBlockOrchestrator := server.initCreateOrderOrchestrator(commandPublisher, replySubscriber)
+	commandSubscriber := server.initSubscriber(server.config.BlockUserCommandSubject, QueueGroup)
+	replyPublisher := server.initPublisher(server.config.BlockUserReplySubject)
+
+	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore, createBlockOrchestrator)
+	server.initBlockUserHandler(connectionService, replyPublisher, commandSubscriber)
+
 	connectionHandler := server.initConnectionHandler(connectionService)
 	server.startGrpcServer(connectionHandler)
 }
@@ -67,6 +79,41 @@ func (server *Server) initConnectionStore(client *mongo.Client) domain.Connectio
 	}
 
 	return store
+}
+
+func (server *Server) initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewNATSPublisher(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return publisher
+}
+
+func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber {
+	subscriber, err := nats.NewNATSSubscriber(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject, queueGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return subscriber
+}
+
+func (server *Server) initCreateOrderOrchestrator(publisher saga.Publisher, subscriber saga.Subscriber) *application.BlockUserOrchestrator {
+	orchestrator, err := application.NewBlockUserOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+
+func (server *Server) initBlockUserHandler(service *application.ConnectionService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewBlockUserCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (server *Server) initUserStore(client *mongo.Client) domain.UserStore {
@@ -121,8 +168,8 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 	connStore.AddRequiredSkillToJobOffer("Java", jobs[1])
 }
 
-func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore) *application.ConnectionService {
-	return application.NewConnectionService(store, userStore, neo4jStore)
+func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore, orchestrator *application.BlockUserOrchestrator) *application.ConnectionService {
+	return application.NewConnectionService(store, userStore, neo4jStore, orchestrator)
 }
 
 func (server *Server) initConnectionHandler(service *application.ConnectionService) *api.ConnectionHandler {

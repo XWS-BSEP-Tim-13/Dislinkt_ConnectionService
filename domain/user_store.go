@@ -12,4 +12,5 @@ type UserStore interface {
 	DeleteAll()
 	CheckIfUsersConnected(fromUsername, toUsername string) (*RegisteredUser, error)
 	CheckIfUserIsBlocked(fromUsername, toUsername string) (*RegisteredUser, error)
+	UpdateBlockedList(user *RegisteredUser) error
 }

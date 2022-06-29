@@ -59,6 +59,12 @@ service ConnectionService{
       get: "/conn/user/users-connected/{username}",
     };
   }
+
+  rpc BlockUser(UserUsername) returns(GetAllRequest){
+    option(google.api.http) = {
+      get: "/conn/user/block/{username}",
+    };
+  }
 }
 
 message GetRequest {

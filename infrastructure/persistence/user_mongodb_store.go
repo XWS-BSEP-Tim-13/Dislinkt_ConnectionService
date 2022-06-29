@@ -72,6 +72,17 @@ func (store *UserMongoDBStore) CheckIfUsersConnected(fromUsername, toUsername st
 	return store.filterOne(filter)
 }
 
+func (store *UserMongoDBStore) UpdateBlockedList(user *domain.RegisteredUser) error {
+	_, err := store.users.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": user.Id, "is_active": true},
+		bson.D{
+			{"$set", bson.D{{"blocked_users", user.BlockedUsers}}},
+		},
+	)
+	return err
+}
+
 func (store *UserMongoDBStore) CheckIfUserIsBlocked(fromUsername, toUsername string) (*domain.RegisteredUser, error) {
 	filter := bson.M{"blocked_users": fromUsername, "username": toUsername}
 	return store.filterOne(filter)
