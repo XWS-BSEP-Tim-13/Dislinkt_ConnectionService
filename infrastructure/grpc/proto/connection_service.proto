@@ -62,7 +62,7 @@ service ConnectionService{
 
   rpc BlockUser(UserUsername) returns(GetAllRequest){
     option(google.api.http) = {
-      get: "/conn/user/block/{username}",
+      put: "/conn/user/block/{username}",
     };
   }
 }
