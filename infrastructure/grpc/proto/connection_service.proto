@@ -47,6 +47,7 @@ service ConnectionService{
       get: "/conn/user/users-connected/{username}",
     };
   }
+  
 }
 
 message BoolMessage{
@@ -105,6 +106,7 @@ enum ConnectionStatus {
   CONNECTION_REQUEST = 1;
   NONEE = 2;
   BLOCKED = 3;
+  BLOCKED_ME =4;
 }
 
 message User {

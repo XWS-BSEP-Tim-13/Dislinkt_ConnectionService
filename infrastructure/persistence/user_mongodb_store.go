@@ -68,25 +68,13 @@ func (store *UserMongoDBStore) Insert(user *domain.RegisteredUser) error {
 
 func (store *UserMongoDBStore) CheckIfUsersConnected(fromUsername, toUsername string) (*domain.RegisteredUser, error) {
 	user, _ := store.GetByUsername(fromUsername)
-	filter := bson.M{"$in": bson.D{{"connections", user.Id}}}
-	filterr := bson.M{
-		"$and": []bson.M{
-			filter,
-			{"username": toUsername},
-		},
-	}
-	return store.filterOne(filterr)
+	filter := bson.M{"connections": user.Id, "username": toUsername}
+	return store.filterOne(filter)
 }
 
 func (store *UserMongoDBStore) CheckIfUserIsBlocked(fromUsername, toUsername string) (*domain.RegisteredUser, error) {
-	filter := bson.M{"$in": bson.D{{"blocked_users", fromUsername}}}
-	filterr := bson.M{
-		"$and": []bson.M{
-			filter,
-			{"username": toUsername},
-		},
-	}
-	return store.filterOne(filterr)
+	filter := bson.M{"blocked_users": fromUsername, "username": toUsername}
+	return store.filterOne(filter)
 }
 
 func (store *UserMongoDBStore) DeleteAll() {

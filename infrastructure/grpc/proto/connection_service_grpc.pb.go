@@ -29,6 +29,7 @@ type ConnectionServiceClient interface {
 	RequestConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	GetConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
 	CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error)
+	BlockUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*GetAllRequest, error)
 }
 
 type connectionServiceClient struct {
@@ -102,6 +103,15 @@ func (c *connectionServiceClient) CheckIfUserConnected(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *connectionServiceClient) BlockUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*GetAllRequest, error) {
+	out := new(GetAllRequest)
+	err := c.cc.Invoke(ctx, "/connection.ConnectionService/BlockUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConnectionServiceServer is the server API for ConnectionService service.
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
@@ -113,6 +123,7 @@ type ConnectionServiceServer interface {
 	RequestConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
 	GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
 	CheckIfUserConnected(context.Context, *UserUsername) (*ConnectionStatusResponse, error)
+	BlockUser(context.Context, *UserUsername) (*GetAllRequest, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -140,6 +151,9 @@ func (UnimplementedConnectionServiceServer) GetConnectionUsernamesForUser(contex
 }
 func (UnimplementedConnectionServiceServer) CheckIfUserConnected(context.Context, *UserUsername) (*ConnectionStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckIfUserConnected not implemented")
+}
+func (UnimplementedConnectionServiceServer) BlockUser(context.Context, *UserUsername) (*GetAllRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlockUser not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
@@ -280,6 +294,24 @@ func _ConnectionService_CheckIfUserConnected_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_BlockUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserUsername)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).BlockUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection.ConnectionService/BlockUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).BlockUser(ctx, req.(*UserUsername))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConnectionService_ServiceDesc is the grpc.ServiceDesc for ConnectionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -314,6 +346,10 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckIfUserConnected",
 			Handler:    _ConnectionService_CheckIfUserConnected_Handler,
+		},
+		{
+			MethodName: "BlockUser",
+			Handler:    _ConnectionService_BlockUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

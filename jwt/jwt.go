@@ -3,14 +3,13 @@ package jwt
 import (
 	"context"
 	"errors"
-	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/startup/config"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
 
-var SigningKey = []byte(config.NewConfig().SigningJwtKey)
+var SigningKey = []byte("123456")
 
 type CustomClaims struct {
 	Username string `json:"username"`

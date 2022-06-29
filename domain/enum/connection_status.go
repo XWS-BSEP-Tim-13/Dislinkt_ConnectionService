@@ -5,6 +5,7 @@ type ConnectionStatus int
 const (
 	CONNECTED ConnectionStatus = iota
 	CONNECTION_REQUEST
-	BLOCKED
 	NONE
+	BLOCKED
+	BLOCKED_ME
 )

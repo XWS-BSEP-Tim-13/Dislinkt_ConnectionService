@@ -122,15 +122,23 @@ func (service *ConnectionService) GetRequestsForUser(id primitive.ObjectID) ([]*
 }
 
 func (service *ConnectionService) CheckIfUserConnected(fromUsername, toUsername string) enum.ConnectionStatus {
-	_, err := service.userStore.CheckIfUsersConnected(fromUsername, toUsername)
+	resp, err := service.userStore.CheckIfUserIsBlocked(fromUsername, toUsername)
+	fmt.Println(resp, err)
+	if resp != nil {
+		return enum.BLOCKED
+	}
+	resp, err = service.userStore.CheckIfUserIsBlocked(toUsername, fromUsername)
+	fmt.Println(resp, err)
+	if resp != nil {
+		return enum.BLOCKED_ME
+	}
+	resp, err = service.userStore.CheckIfUsersConnected(fromUsername, toUsername)
+	fmt.Println(resp, err)
 	if err == nil {
 		return enum.CONNECTED
 	}
-	_, err = service.userStore.CheckIfUserIsBlocked(fromUsername, toUsername)
-	if err != nil {
-		return enum.BLOCKED
-	}
 	isRequested := service.store.CheckIfUsersConnected(fromUsername, toUsername)
+	fmt.Println(isRequested)
 	if isRequested {
 		return enum.CONNECTION_REQUEST
 	}
