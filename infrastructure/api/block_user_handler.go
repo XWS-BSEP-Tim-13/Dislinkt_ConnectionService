@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	events "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/block_user"
 	saga "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/application"
@@ -35,22 +36,29 @@ func (handler *BlockUserCommandHandler) handle(command *events.BlockUserCommand)
 			return
 		}
 		reply.Type = events.RemoveConnectionFromUserUpdated
+		fmt.Println("Step 1")
 	case events.RemoveConnectionToUser:
 		err := handler.connectionService.DeleteConnection(reply.Users.UserTo, reply.Users.UserFrom)
 		if err != nil {
 			return
 		}
-		reply.Type = events.RemoveConnectionFromUserUpdated
+		reply.Type = events.RemoveConnectionToUserUpdated
+		fmt.Println("Step 2")
 	case events.BlockUser:
 		err := handler.connectionService.BlockUser(reply.Users.UserFrom, reply.Users.UserTo)
+		reply.Type = events.UserBlocked
 		if err != nil {
-			return
+			reply.Type = events.ErrorOccured
 		}
+		fmt.Println("Step 3")
 	case events.FinnishFunction:
+		fmt.Println("Step 4")
 		return
 	case events.RollbackUpdates:
+		fmt.Println("Step errror")
 		return
 	default:
+		fmt.Println("Step unknown")
 		reply.Type = events.UnknownReply
 	}
 

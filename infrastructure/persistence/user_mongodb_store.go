@@ -67,8 +67,7 @@ func (store *UserMongoDBStore) Insert(user *domain.RegisteredUser) error {
 }
 
 func (store *UserMongoDBStore) CheckIfUsersConnected(fromUsername, toUsername string) (*domain.RegisteredUser, error) {
-	user, _ := store.GetByUsername(fromUsername)
-	filter := bson.M{"connections": user.Id, "username": toUsername}
+	filter := bson.M{"connections": fromUsername, "username": toUsername}
 	return store.filterOne(filter)
 }
 

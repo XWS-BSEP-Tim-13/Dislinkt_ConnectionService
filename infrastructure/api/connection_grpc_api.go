@@ -82,13 +82,28 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 	return response, nil
 }
 
+func (handler *ConnectionHandler) UnBlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
+	usernameTo, err := jwt.ExtractUsernameFromToken(ctx)
+	err = handler.service.UnblockUser(usernameTo, request.Username)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	response := &pb.GetAllRequest{}
+	return response, nil
+}
+
 func (handler *ConnectionHandler) BlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
+	fmt.Println("block started")
 	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
+		fmt.Println("Stopped on extracting username")
+		fmt.Println(err)
 		return nil, err
 	}
 	err = handler.service.BlockOrchestrator(usernameFrom, request.Username)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	response := &pb.GetAllRequest{}
@@ -97,6 +112,7 @@ func (handler *ConnectionHandler) BlockUser(ctx context.Context, request *pb.Use
 
 func (handler *ConnectionHandler) CheckIfUserConnected(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionStatusResponse, error) {
 	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
+	fmt.Println("Check has started", usernameFrom)
 	if err != nil {
 		fmt.Println(err)
 		response := &pb.ConnectionStatusResponse{

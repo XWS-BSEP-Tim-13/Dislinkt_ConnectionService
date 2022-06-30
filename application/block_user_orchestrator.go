@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	events "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/block_user"
 	messaging "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging"
 )
@@ -23,8 +24,9 @@ func NewBlockUserOrchestrator(publisher messaging.Publisher, subscriber messagin
 }
 
 func (o *BlockUserOrchestrator) Start(usernameFrom, usernameTo string) error {
+	fmt.Println("Start orch")
 	event := &events.BlockUserCommand{
-		Type: events.RemoveConnectionToUser,
+		Type: events.RemoveConnectionFromUser,
 		Users: events.Users{
 			UserFrom: usernameFrom,
 			UserTo:   usernameTo,

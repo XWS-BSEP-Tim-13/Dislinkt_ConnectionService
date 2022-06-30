@@ -79,40 +79,51 @@ func (service *ConnectionService) AcceptConnection(connectionId primitive.Object
 	return nil
 }
 
-//func (service *ConnectionService) DeleteConnection(idFrom, idTo primitive.ObjectID) error {
-//	user, err := service.userStore.GetActiveById(idTo)
-//	if err != nil {
-//		return err
-//	}
-//	indx := -1
-//	for i, connection := range user.Connections {
-//		fmt.Printf("Saved connection %s \n", connection)
-//		if connection == idFrom {
-//			indx = i
-//			break
-//		}
-//	}
-//	fmt.Printf("Index %d \n", indx)
-//	if indx == -1 {
-//		return nil
-//	}
-//	//TODO delete connection between users
-//	userFrom, err := service.userStore.GetActiveById(idFrom)
-//	service.connectionNeo4j.DeleteConnection(userFrom.Username, user.Username)
-//
-//	user.Connections[indx] = user.Connections[len(user.Connections)-1]
-//	user.Connections = user.Connections[:len(user.Connections)-1]
-//	err = service.userStore.Update(user)
-//	if err != nil {
-//		return err
-//	}
-//	service.connectionNeo4j.DeleteConnection(usernameFrom, usernameTo)
-//	return nil
-//}
-
 func (service *ConnectionService) DeleteConnection(usernameFrom, usernameTo string) error {
+	user, err := service.userStore.GetActiveByUsername(usernameTo)
+	if err != nil {
+		return err
+	}
+	indx := -1
+	for i, connection := range user.Connections {
+		fmt.Printf("Saved connection %s \n", connection)
+		if connection == usernameFrom {
+			indx = i
+			break
+		}
+	}
+	fmt.Printf("Index %d \n", indx)
+	if indx == -1 {
+		return nil
+	}
+	user.Connections[indx] = user.Connections[len(user.Connections)-1]
+	user.Connections = user.Connections[:len(user.Connections)-1]
+	err = service.userStore.Update(user)
 	fmt.Println("Delete stared...", usernameTo)
 	service.connectionNeo4j.DeleteConnection(usernameFrom, usernameTo)
+	return nil
+}
+
+func (service *ConnectionService) UnblockUser(usernameFrom, usernameTo string) error {
+	user, err := service.userStore.GetActiveByUsername(usernameTo)
+	if err != nil {
+		return err
+	}
+	indx := -1
+	for i, blocks := range user.BlockedUsers {
+		fmt.Printf("Saved connection %s \n", blocks)
+		if blocks == usernameFrom {
+			indx = i
+			break
+		}
+	}
+	fmt.Printf("Index %d \n", indx)
+	if indx == -1 {
+		return nil
+	}
+	user.BlockedUsers[indx] = user.BlockedUsers[len(user.BlockedUsers)-1]
+	user.BlockedUsers = user.BlockedUsers[:len(user.BlockedUsers)-1]
+	err = service.userStore.Update(user)
 	return nil
 }
 
@@ -126,13 +137,13 @@ func (service *ConnectionService) GetRequestsForUser(username string) ([]*domain
 	return resp, err
 }
 
-func (service *ConnectionService) BlockUser(usernameFrom, usernamteTo string) error {
+func (service *ConnectionService) BlockUser(usernameFrom, usernameTo string) error {
 	fmt.Println("Block user")
 	user, err := service.userStore.GetByUsername(usernameFrom)
 	if err != nil {
 		return err
 	}
-	user.BlockedUsers = append(user.BlockedUsers, usernamteTo)
+	user.BlockedUsers = append(user.BlockedUsers, usernameTo)
 	err = service.userStore.UpdateBlockedList(user)
 	if err != nil {
 		return err
@@ -141,12 +152,12 @@ func (service *ConnectionService) BlockUser(usernameFrom, usernamteTo string) er
 }
 
 func (service *ConnectionService) CheckIfUserConnected(fromUsername, toUsername string) enum.ConnectionStatus {
-	resp, err := service.userStore.CheckIfUserIsBlocked(fromUsername, toUsername)
+	resp, err := service.userStore.CheckIfUserIsBlocked(toUsername, fromUsername)
 	fmt.Println(resp, err)
 	if resp != nil {
 		return enum.BLOCKED
 	}
-	resp, err = service.userStore.CheckIfUserIsBlocked(toUsername, fromUsername)
+	resp, err = service.userStore.CheckIfUserIsBlocked(fromUsername, toUsername)
 	fmt.Println(resp, err)
 	if resp != nil {
 		return enum.BLOCKED_ME

@@ -3,6 +3,7 @@ package jwt
 import (
 	"context"
 	"errors"
+	"fmt"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"google.golang.org/grpc"
@@ -59,13 +60,15 @@ func ExtractRoleFromToken(ctx context.Context) (string, error) {
 
 func ExtractUsernameFromToken(ctx context.Context) (string, error) {
 	tokenStr, err := grpc_auth.AuthFromMD(ctx, "Bearer")
-
+	fmt.Println(tokenStr)
 	if err != nil {
 		return "", grpc.Errorf(codes.Unauthenticated, err.Error())
 	}
 
 	token, claims, err := ParseJwt(tokenStr)
+	fmt.Println(claims)
 	if err != nil || token == nil {
+		fmt.Println(err)
 		return "", grpc.Errorf(codes.Unauthenticated, err.Error())
 	} else if !token.Valid {
 		return "", grpc.Errorf(codes.Unauthenticated, "Invalid Token")
