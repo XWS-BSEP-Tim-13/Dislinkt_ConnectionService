@@ -68,7 +68,7 @@ service ConnectionService{
 
   rpc UnBlockUser(UserUsername) returns(GetAllRequest){
     option(google.api.http) = {
-      put: "/conn/user/ubblock/{username}",
+      put: "/conn/user/unblock/{username}",
     };
   }
 
