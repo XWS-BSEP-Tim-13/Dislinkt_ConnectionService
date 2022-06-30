@@ -67,15 +67,20 @@ func (service *ConnectionService) GetConnectionUsernamesForUser(username string)
 	return retVal, nil
 }
 
-func (service *ConnectionService) AcceptConnection(connectionId primitive.ObjectID) error {
-	connection, err := service.store.Get(connectionId)
+func (service *ConnectionService) AcceptConnection(usernameFrom, usernameTo string) error {
+	connection, err := service.store.GetConnectionByUsernames(usernameFrom, usernameTo)
 	if err != nil {
 		return err
 	}
+	user, err := service.userStore.GetByUsername(usernameTo)
+	if err != nil {
+		return err
+	}
+	user.Connections = append(user.Connections, usernameFrom)
 	connection.To.Connections = append(connection.To.Connections, connection.From.Username)
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
 	service.connectionNeo4j.CreateConnectionBetweenUsers(&connection.From, &connection.To)
-	service.store.Delete(connectionId)
+	service.store.Delete(connection.Id)
 	return nil
 }
 
@@ -127,8 +132,10 @@ func (service *ConnectionService) UnblockUser(usernameFrom, usernameTo string) e
 	return nil
 }
 
-func (service *ConnectionService) DeleteConnectionRequest(connectionId primitive.ObjectID) {
-	service.store.Delete(connectionId)
+func (service *ConnectionService) DeleteConnectionRequest(usernameFrom, usernameTo string) {
+	fmt.Println("delete connection request", usernameTo, usernameFrom)
+	request, _ := service.store.GetConnectionByUsernames(usernameFrom, usernameTo)
+	service.store.Delete(request.Id)
 }
 
 func (service *ConnectionService) GetRequestsForUser(username string) ([]*domain.ConnectionRequest, error) {

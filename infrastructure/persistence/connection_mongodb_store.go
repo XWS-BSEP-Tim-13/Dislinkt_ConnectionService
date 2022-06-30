@@ -52,6 +52,12 @@ func (store ConnectionsMongoDBStore) Insert(connection *domain.ConnectionRequest
 func (store ConnectionsMongoDBStore) DeleteAll() {
 	store.connections.DeleteMany(context.TODO(), bson.D{{}})
 }
+
+func (store ConnectionsMongoDBStore) GetConnectionByUsernames(usernameFrom, usernameTo string) (*domain.ConnectionRequest, error) {
+	filter := bson.M{"to.username": usernameTo, "from.username": usernameFrom}
+	return store.filterOne(filter)
+}
+
 func (store ConnectionsMongoDBStore) CheckIfUsersConnected(usernameFrom, usernameTo string) bool {
 	filter := bson.M{"to.username": usernameTo, "from.username": usernameFrom}
 	_, err := store.filterOne(filter)

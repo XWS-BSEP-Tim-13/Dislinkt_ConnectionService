@@ -102,7 +102,7 @@ var users = []*domain.RegisteredUser{
 		Educations:   []domain.Education{},
 		Skills:       []string{"AWS", "Java"},
 		Interests:    []primitive.ObjectID{},
-		Connections:  []string{"marijakljestan", "anagavrilovic", "srdjansukovic"},
+		Connections:  []string{"anagavrilovic", "srdjansukovic"},
 		BlockedUsers: []string{"marijakljestan"},
 	},
 	{

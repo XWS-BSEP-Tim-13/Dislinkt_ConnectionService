@@ -6,7 +6,6 @@ import (
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/application"
 	pb "github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/grpc/proto"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/jwt"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ConnectionHandler struct {
@@ -34,21 +33,25 @@ func (handler *ConnectionHandler) GetRequestsForUser(ctx context.Context, reques
 	return response, nil
 }
 
-func (handler *ConnectionHandler) AcceptConnectionRequest(ctx context.Context, request *pb.GetRequest) (*pb.ConnectionResponse, error) {
-	connectionId, err := primitive.ObjectIDFromHex(request.Id)
+func (handler *ConnectionHandler) AcceptConnectionRequest(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionResponse, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
-	handler.service.AcceptConnection(connectionId)
+	fmt.Println("Delete con request started")
+	handler.service.AcceptConnection(request.Username, username)
 	return new(pb.ConnectionResponse), nil
 }
 
-func (handler *ConnectionHandler) DeleteConnectionRequest(ctx context.Context, request *pb.GetRequest) (*pb.ConnectionResponse, error) {
-	connectionId, err := primitive.ObjectIDFromHex(request.Id)
+func (handler *ConnectionHandler) DeleteConnectionRequest(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionResponse, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
-	handler.service.DeleteConnectionRequest(connectionId)
+	fmt.Println("Delete con request started")
+	handler.service.DeleteConnectionRequest(username, request.Username)
 	return new(pb.ConnectionResponse), nil
 }
 
@@ -62,10 +65,10 @@ func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request 
 	return new(pb.ConnectionResponse), nil
 }
 
-func (handler *ConnectionHandler) RequestConnection(ctx context.Context, request *pb.ConnectionBody) (*pb.ConnectionResponse, error) {
-	usernameFrom := request.Connection.UsernameFrom
-	usernameTo := request.Connection.UsernameTo
-	handler.service.RequestConnection(usernameFrom, usernameTo)
+func (handler *ConnectionHandler) RequestConnection(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionResponse, error) {
+	username, _ := jwt.ExtractUsernameFromToken(ctx)
+	fmt.Println(request.Username)
+	handler.service.RequestConnection(username, request.Username)
 	fmt.Printf("Returning to func")
 	return new(pb.ConnectionResponse), nil
 }
@@ -84,7 +87,7 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 
 func (handler *ConnectionHandler) UnBlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
 	usernameTo, err := jwt.ExtractUsernameFromToken(ctx)
-	err = handler.service.UnblockUser(usernameTo, request.Username)
+	err = handler.service.UnblockUser(request.Username, usernameTo)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

@@ -14,14 +14,14 @@ service ConnectionService{
     };
   }
 
-  rpc AcceptConnectionRequest(GetRequest) returns(ConnectionResponse){
+  rpc AcceptConnectionRequest(UserUsername) returns(ConnectionResponse){
     option(google.api.http) = {
-      post: "/conn/connection-request/accept/{id}"
+      post: "/conn/connection-request/accept/{username}"
     };
   }
-  rpc DeleteConnectionRequest(GetRequest) returns(ConnectionResponse){
+  rpc DeleteConnectionRequest(UserUsername) returns(ConnectionResponse){
     option(google.api.http) = {
-      delete: "/conn/connection-request/{id}"
+      delete: "/conn/connection-request/{username}"
     };
   }
 
@@ -31,10 +31,9 @@ service ConnectionService{
       body: "connection"
     };
   }
-  rpc RequestConnection(ConnectionBody) returns(ConnectionResponse){
+  rpc RequestConnection(UserUsername) returns(ConnectionResponse){
     option (google.api.http) = {
-      post: "/conn/connection-request"
-      body: "connection"
+      post: "/conn/connection-request/{username}"
     };
   }
   rpc GetConnectionUsernamesForUser(UserUsername) returns(UserConnectionUsernames){
