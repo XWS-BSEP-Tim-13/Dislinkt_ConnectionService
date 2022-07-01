@@ -25,27 +25,32 @@ func NewConnectionService(store domain.ConnectionStore, userStore domain.UserSto
 	}
 }
 
-func (service *ConnectionService) RequestConnection(usernameFrom, usernameTo string) error {
+func (service *ConnectionService) RequestConnection(usernameFrom, usernameTo string) (enum.ConnectionStatus, error) {
 	toUser, err := service.userStore.GetActiveByUsername(usernameTo)
 	fromUser, _ := service.userStore.GetActiveByUsername(usernameFrom)
+	ret := enum.CONNECTED
+	fmt.Println("Request", usernameTo, usernameFrom)
 	if err != nil {
-		return err
+		return enum.NONE, err
 	}
 	if toUser.IsPrivate {
+		fmt.Println("Is private")
 		var request = domain.ConnectionRequest{
 			Id:          primitive.NewObjectID(),
 			From:        *fromUser,
 			To:          *toUser,
 			RequestTime: time.Now(),
 		}
+		ret = enum.CONNECTION_REQUEST
 		service.store.Insert(&request)
 	} else {
+		fmt.Println("Is not")
 		toUser.Connections = append(toUser.Connections, usernameFrom)
 		service.userStore.Update(toUser)
 		service.connectionNeo4j.CreateConnectionBetweenUsers(toUser, fromUser)
 	}
 	fmt.Printf("Saved to db: \n")
-	return nil
+	return ret, nil
 }
 
 func (service *ConnectionService) BlockOrchestrator(usernameFrom, usernameTo string) error {

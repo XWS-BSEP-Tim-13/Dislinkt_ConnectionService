@@ -26,7 +26,7 @@ type ConnectionServiceClient interface {
 	AcceptConnectionRequest(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	DeleteConnectionRequest(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	DeleteConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
-	RequestConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error)
+	RequestConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error)
 	GetConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
 	GetSuggestedConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
 	FindJobOffersBasedOnUserSkills(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*JobOffers, error)
@@ -79,8 +79,8 @@ func (c *connectionServiceClient) DeleteConnection(ctx context.Context, in *Conn
 	return out, nil
 }
 
-func (c *connectionServiceClient) RequestConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error) {
-	out := new(ConnectionResponse)
+func (c *connectionServiceClient) RequestConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error) {
+	out := new(ConnectionStatusResponse)
 	err := c.cc.Invoke(ctx, "/connection.ConnectionService/RequestConnection", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -150,7 +150,7 @@ type ConnectionServiceServer interface {
 	AcceptConnectionRequest(context.Context, *UserUsername) (*ConnectionResponse, error)
 	DeleteConnectionRequest(context.Context, *UserUsername) (*ConnectionResponse, error)
 	DeleteConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
-	RequestConnection(context.Context, *UserUsername) (*ConnectionResponse, error)
+	RequestConnection(context.Context, *UserUsername) (*ConnectionStatusResponse, error)
 	GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
 	GetSuggestedConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
 	FindJobOffersBasedOnUserSkills(context.Context, *UserUsername) (*JobOffers, error)
@@ -176,7 +176,7 @@ func (UnimplementedConnectionServiceServer) DeleteConnectionRequest(context.Cont
 func (UnimplementedConnectionServiceServer) DeleteConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteConnection not implemented")
 }
-func (UnimplementedConnectionServiceServer) RequestConnection(context.Context, *UserUsername) (*ConnectionResponse, error) {
+func (UnimplementedConnectionServiceServer) RequestConnection(context.Context, *UserUsername) (*ConnectionStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestConnection not implemented")
 }
 func (UnimplementedConnectionServiceServer) GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error) {

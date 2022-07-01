@@ -31,7 +31,7 @@ service ConnectionService{
       body: "connection"
     };
   }
-  rpc RequestConnection(UserUsername) returns(ConnectionResponse){
+  rpc RequestConnection(UserUsername) returns(ConnectionStatusResponse){
     option (google.api.http) = {
       post: "/conn/connection-request/{username}"
     };

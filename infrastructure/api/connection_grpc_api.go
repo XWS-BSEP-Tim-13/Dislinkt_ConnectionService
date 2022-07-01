@@ -65,12 +65,19 @@ func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request 
 	return new(pb.ConnectionResponse), nil
 }
 
-func (handler *ConnectionHandler) RequestConnection(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionResponse, error) {
+func (handler *ConnectionHandler) RequestConnection(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionStatusResponse, error) {
 	username, _ := jwt.ExtractUsernameFromToken(ctx)
 	fmt.Println(request.Username)
-	handler.service.RequestConnection(username, request.Username)
-	fmt.Printf("Returning to func")
-	return new(pb.ConnectionResponse), nil
+	ret, err := handler.service.RequestConnection(username, request.Username)
+	if err != nil {
+		return nil, err
+	}
+	pbVal := pb.ConnectionStatus(ret)
+
+	response := &pb.ConnectionStatusResponse{
+		ConnectionStatus: pbVal,
+	}
+	return response, nil
 }
 
 func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Context, request *pb.UserUsername) (*pb.UserConnectionUsernames, error) {
