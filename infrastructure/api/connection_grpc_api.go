@@ -55,10 +55,13 @@ func (handler *ConnectionHandler) DeleteConnectionRequest(ctx context.Context, r
 	return new(pb.ConnectionResponse), nil
 }
 
-func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request *pb.ConnectionBody) (*pb.ConnectionResponse, error) {
-	usernameFrom := request.Connection.UsernameFrom
-	usernameTo := request.Connection.UsernameTo
-	err := handler.service.DeleteConnection(usernameFrom, usernameTo)
+func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionResponse, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	err = handler.service.DeleteConnection(request.Username, username)
 	if err != nil {
 		return nil, err
 	}

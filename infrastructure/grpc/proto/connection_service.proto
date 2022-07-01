@@ -25,10 +25,9 @@ service ConnectionService{
     };
   }
 
-  rpc DeleteConnection(ConnectionBody) returns(ConnectionResponse){
+  rpc DeleteConnection(UserUsername) returns(ConnectionResponse){
     option(google.api.http) = {
-      put: "/conn/user/delete-connection"
-      body: "connection"
+      put: "/conn/user/delete-connection/{username}"
     };
   }
   rpc RequestConnection(UserUsername) returns(ConnectionStatusResponse){

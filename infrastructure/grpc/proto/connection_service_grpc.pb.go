@@ -25,7 +25,7 @@ type ConnectionServiceClient interface {
 	GetRequestsForUser(ctx context.Context, in *GetRequestUsername, opts ...grpc.CallOption) (*ConnectionRequests, error)
 	AcceptConnectionRequest(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	DeleteConnectionRequest(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error)
-	DeleteConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error)
+	DeleteConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	RequestConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error)
 	GetConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
 	GetSuggestedConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
@@ -70,7 +70,7 @@ func (c *connectionServiceClient) DeleteConnectionRequest(ctx context.Context, i
 	return out, nil
 }
 
-func (c *connectionServiceClient) DeleteConnection(ctx context.Context, in *ConnectionBody, opts ...grpc.CallOption) (*ConnectionResponse, error) {
+func (c *connectionServiceClient) DeleteConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error) {
 	out := new(ConnectionResponse)
 	err := c.cc.Invoke(ctx, "/connection.ConnectionService/DeleteConnection", in, out, opts...)
 	if err != nil {
@@ -149,7 +149,7 @@ type ConnectionServiceServer interface {
 	GetRequestsForUser(context.Context, *GetRequestUsername) (*ConnectionRequests, error)
 	AcceptConnectionRequest(context.Context, *UserUsername) (*ConnectionResponse, error)
 	DeleteConnectionRequest(context.Context, *UserUsername) (*ConnectionResponse, error)
-	DeleteConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error)
+	DeleteConnection(context.Context, *UserUsername) (*ConnectionResponse, error)
 	RequestConnection(context.Context, *UserUsername) (*ConnectionStatusResponse, error)
 	GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
 	GetSuggestedConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
@@ -173,7 +173,7 @@ func (UnimplementedConnectionServiceServer) AcceptConnectionRequest(context.Cont
 func (UnimplementedConnectionServiceServer) DeleteConnectionRequest(context.Context, *UserUsername) (*ConnectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteConnectionRequest not implemented")
 }
-func (UnimplementedConnectionServiceServer) DeleteConnection(context.Context, *ConnectionBody) (*ConnectionResponse, error) {
+func (UnimplementedConnectionServiceServer) DeleteConnection(context.Context, *UserUsername) (*ConnectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteConnection not implemented")
 }
 func (UnimplementedConnectionServiceServer) RequestConnection(context.Context, *UserUsername) (*ConnectionStatusResponse, error) {
@@ -265,7 +265,7 @@ func _ConnectionService_DeleteConnectionRequest_Handler(srv interface{}, ctx con
 }
 
 func _ConnectionService_DeleteConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConnectionBody)
+	in := new(UserUsername)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -277,7 +277,7 @@ func _ConnectionService_DeleteConnection_Handler(srv interface{}, ctx context.Co
 		FullMethod: "/connection.ConnectionService/DeleteConnection",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectionServiceServer).DeleteConnection(ctx, req.(*ConnectionBody))
+		return srv.(ConnectionServiceServer).DeleteConnection(ctx, req.(*UserUsername))
 	}
 	return interceptor(ctx, in, info, handler)
 }
