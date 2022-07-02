@@ -2,8 +2,6 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 cloud.google.com/go v0.34.0 h1:eOI3/cP2VTU6uZLDYAoic+eyzzB9YyGmJ7eIjl8rOPg=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway v0.0.9 h1:ezNzrdyVAlcab7xCcSZNR9bneXLMgDK6YreAKiyN694=
-github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway v0.0.9/go.mod h1:rwCfVd14S76v+5j78s6SWtW9BkcHHyUNWL9Z55iphj4=
 github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway v1.0.0 h1:ENeuG6WWplcnxNuM7QV2gXloEQUcm6zHm1WEjBwR0iQ=
 github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway v1.0.0/go.mod h1:rwCfVd14S76v+5j78s6SWtW9BkcHHyUNWL9Z55iphj4=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
