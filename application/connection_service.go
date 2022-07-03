@@ -174,7 +174,7 @@ func (service *ConnectionService) CheckIfUserConnected(fromUsername, toUsername 
 	if resp != nil {
 		return enum.BLOCKED_ME
 	}
-	resp, err = service.userStore.CheckIfUsersConnected(fromUsername, toUsername)
+	resp, err = service.userStore.CheckIfUsersConnected(toUsername, fromUsername)
 	fmt.Println(resp, err)
 	if err == nil {
 		return enum.CONNECTED

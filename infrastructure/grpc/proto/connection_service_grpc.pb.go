@@ -27,7 +27,7 @@ type ConnectionServiceClient interface {
 	DeleteConnectionRequest(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	DeleteConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionResponse, error)
 	RequestConnection(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error)
-	GetConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
+	GetConnectionUsernamesForUser(ctx context.Context, in *ConnectionResponse, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
 	GetSuggestedConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error)
 	FindJobOffersBasedOnUserSkills(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*JobOffers, error)
 	CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error)
@@ -88,7 +88,7 @@ func (c *connectionServiceClient) RequestConnection(ctx context.Context, in *Use
 	return out, nil
 }
 
-func (c *connectionServiceClient) GetConnectionUsernamesForUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*UserConnectionUsernames, error) {
+func (c *connectionServiceClient) GetConnectionUsernamesForUser(ctx context.Context, in *ConnectionResponse, opts ...grpc.CallOption) (*UserConnectionUsernames, error) {
 	out := new(UserConnectionUsernames)
 	err := c.cc.Invoke(ctx, "/connection.ConnectionService/GetConnectionUsernamesForUser", in, out, opts...)
 	if err != nil {
@@ -151,7 +151,7 @@ type ConnectionServiceServer interface {
 	DeleteConnectionRequest(context.Context, *UserUsername) (*ConnectionResponse, error)
 	DeleteConnection(context.Context, *UserUsername) (*ConnectionResponse, error)
 	RequestConnection(context.Context, *UserUsername) (*ConnectionStatusResponse, error)
-	GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
+	GetConnectionUsernamesForUser(context.Context, *ConnectionResponse) (*UserConnectionUsernames, error)
 	GetSuggestedConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error)
 	FindJobOffersBasedOnUserSkills(context.Context, *UserUsername) (*JobOffers, error)
 	CheckIfUserConnected(context.Context, *UserUsername) (*ConnectionStatusResponse, error)
@@ -179,7 +179,7 @@ func (UnimplementedConnectionServiceServer) DeleteConnection(context.Context, *U
 func (UnimplementedConnectionServiceServer) RequestConnection(context.Context, *UserUsername) (*ConnectionStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestConnection not implemented")
 }
-func (UnimplementedConnectionServiceServer) GetConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error) {
+func (UnimplementedConnectionServiceServer) GetConnectionUsernamesForUser(context.Context, *ConnectionResponse) (*UserConnectionUsernames, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConnectionUsernamesForUser not implemented")
 }
 func (UnimplementedConnectionServiceServer) GetSuggestedConnectionUsernamesForUser(context.Context, *UserUsername) (*UserConnectionUsernames, error) {
@@ -301,7 +301,7 @@ func _ConnectionService_RequestConnection_Handler(srv interface{}, ctx context.C
 }
 
 func _ConnectionService_GetConnectionUsernamesForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserUsername)
+	in := new(ConnectionResponse)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -313,7 +313,7 @@ func _ConnectionService_GetConnectionUsernamesForUser_Handler(srv interface{}, c
 		FullMethod: "/connection.ConnectionService/GetConnectionUsernamesForUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConnectionServiceServer).GetConnectionUsernamesForUser(ctx, req.(*UserUsername))
+		return srv.(ConnectionServiceServer).GetConnectionUsernamesForUser(ctx, req.(*ConnectionResponse))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -35,9 +35,9 @@ service ConnectionService{
       post: "/conn/connection-request/{username}"
     };
   }
-  rpc GetConnectionUsernamesForUser(UserUsername) returns(UserConnectionUsernames){
+  rpc GetConnectionUsernamesForUser(ConnectionResponse) returns(UserConnectionUsernames){
     option(google.api.http) = {
-      get: "/conn/user/user-connection-usernames/{username}",
+      get: "/conn/user/user-connection-usernames",
     };
   }
   rpc GetSuggestedConnectionUsernamesForUser(UserUsername) returns(UserConnectionUsernames){

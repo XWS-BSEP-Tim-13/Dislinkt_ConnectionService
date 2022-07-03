@@ -292,25 +292,8 @@ func local_request_ConnectionService_RequestConnection_0(ctx context.Context, ma
 }
 
 func request_ConnectionService_GetConnectionUsernamesForUser_0(ctx context.Context, marshaler runtime.Marshaler, client ConnectionServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UserUsername
+	var protoReq ConnectionResponse
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["username"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "username")
-	}
-
-	protoReq.Username, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "username", err)
-	}
 
 	msg, err := client.GetConnectionUsernamesForUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -318,25 +301,8 @@ func request_ConnectionService_GetConnectionUsernamesForUser_0(ctx context.Conte
 }
 
 func local_request_ConnectionService_GetConnectionUsernamesForUser_0(ctx context.Context, marshaler runtime.Marshaler, server ConnectionServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UserUsername
+	var protoReq ConnectionResponse
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["username"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "username")
-	}
-
-	protoReq.Username, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "username", err)
-	}
 
 	msg, err := server.GetConnectionUsernamesForUser(ctx, &protoReq)
 	return msg, metadata, err
@@ -736,7 +702,7 @@ func RegisterConnectionServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/connection.ConnectionService/GetConnectionUsernamesForUser", runtime.WithHTTPPathPattern("/conn/user/user-connection-usernames/{username}"))
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/connection.ConnectionService/GetConnectionUsernamesForUser", runtime.WithHTTPPathPattern("/conn/user/user-connection-usernames"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1024,7 +990,7 @@ func RegisterConnectionServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
-		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/connection.ConnectionService/GetConnectionUsernamesForUser", runtime.WithHTTPPathPattern("/conn/user/user-connection-usernames/{username}"))
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/connection.ConnectionService/GetConnectionUsernamesForUser", runtime.WithHTTPPathPattern("/conn/user/user-connection-usernames"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1159,7 +1125,7 @@ var (
 
 	pattern_ConnectionService_RequestConnection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"conn", "connection-request", "username"}, ""))
 
-	pattern_ConnectionService_GetConnectionUsernamesForUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"conn", "user", "user-connection-usernames", "username"}, ""))
+	pattern_ConnectionService_GetConnectionUsernamesForUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"conn", "user", "user-connection-usernames"}, ""))
 
 	pattern_ConnectionService_GetSuggestedConnectionUsernamesForUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"conn", "user", "suggested-connection-usernames", "username"}, ""))
 
