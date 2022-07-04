@@ -1,8 +1,6 @@
 package startup
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 	saga "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging/nats"
@@ -15,8 +13,6 @@ import (
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"io/ioutil"
 	"log"
 	"net"
 )
@@ -177,7 +173,7 @@ func (server *Server) initConnectionHandler(service *application.ConnectionServi
 }
 
 func (server *Server) startGrpcServer(productHandler *api.ConnectionHandler) {
-	cert, err := tls.LoadX509KeyPair(serverCertFile, serverKeyFile)
+	/*cert, err := tls.LoadX509KeyPair(serverCertFile, serverKeyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -200,13 +196,13 @@ func (server *Server) startGrpcServer(productHandler *api.ConnectionHandler) {
 
 	opts := []grpc.ServerOption{
 		grpc.Creds(credentials.NewTLS(config)),
-	}
+	}*/
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	grpcServer := grpc.NewServer(opts...)
+	grpcServer := grpc.NewServer()
 	connection.RegisterConnectionServiceServer(grpcServer, productHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
