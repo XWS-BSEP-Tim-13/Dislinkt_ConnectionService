@@ -144,9 +144,9 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 	connStore.CreateConnectionBetweenUsers(userSrki, userAna)
 	connStore.CreateConnectionBetweenUsers(userAna, userSrki)
 	connStore.CreateConnectionBetweenUsers(userSrki, userLjuba)
-	connStore.CreateConnectionBetweenUsers(userLjuba, userMarija)
+	connStore.CreateConnectionBetweenUsers(userLenka, userMarija)
 	connStore.CreateConnectionBetweenUsers(userMarija, userAna)
-	connStore.CreateConnectionBetweenUsers(userLenka, userAna)
+	connStore.CreateConnectionBetweenUsers(userAna, userLenka)
 
 	connStore.AddSkillToUser(userAna, "Java")
 	connStore.AddSkillToUser(userAna, "Docker")
