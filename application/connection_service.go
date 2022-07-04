@@ -72,6 +72,16 @@ func (service *ConnectionService) GetConnectionUsernamesForUser(username string)
 	return retVal, nil
 }
 
+func (service *ConnectionService) GetConnectionSuggestionsForUser(username string) ([]string, error) {
+	var retVal []string
+	connections, _ := service.connectionNeo4j.FindSuggestedConnectionsForUser(username)
+	for _, connUsername := range connections {
+		retVal = append(retVal, connUsername)
+	}
+
+	return retVal, nil
+}
+
 func (service *ConnectionService) AcceptConnection(usernameFrom, usernameTo string) error {
 	connection, err := service.store.GetConnectionByUsernames(usernameFrom, usernameTo)
 	if err != nil {

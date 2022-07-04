@@ -102,6 +102,25 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 	return response, nil
 }
 
+func (handler *ConnectionHandler) GetSuggestedConnectionUsernamesForUser(ctx context.Context, request *pb.UserUsername) (*pb.UserConnectionUsernames, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
+	if err != nil {
+		response := &pb.UserConnectionUsernames{
+			Usernames: []string{},
+		}
+		return response, nil
+	}
+	fmt.Println(username)
+	connUsernames, err := handler.service.GetConnectionSuggestionsForUser(username)
+	response := &pb.UserConnectionUsernames{
+		Usernames: connUsernames,
+	}
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 func (handler *ConnectionHandler) UnBlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
 	usernameTo, err := jwt.ExtractUsernameFromToken(ctx)
 	err = handler.service.UnblockUser(request.Username, usernameTo)
