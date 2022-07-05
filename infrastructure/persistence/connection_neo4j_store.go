@@ -3,6 +3,7 @@ package persistence
 import (
 	"fmt"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/domain"
+	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/domain/enum"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 )
 
@@ -283,7 +284,7 @@ func (u *ConnectionNeo4jStore) persistJobOfferAsNode(tx neo4j.Transaction, offer
 	query := "MERGE (:JobOfferNode {position: $position, company: $company, description: $description, type: $type})"
 	parameters := map[string]interface{}{
 		"position":    offer.Position,
-		"company":     offer.Company.Username,
+		"company":     offer.Company.CompanyName,
 		"description": offer.JobDescription,
 		"type":        offer.EmploymentType,
 	}
@@ -323,9 +324,9 @@ func (u *ConnectionNeo4jStore) persistConnectionBetweenUserAndExperience(tx neo4
 }
 
 func (u *ConnectionNeo4jStore) persistConnectionBetweenCompanyAndJobOffer(tx neo4j.Transaction, company *domain.Company, offer *domain.JobOffer) (interface{}, error) {
-	query := "MATCH (c:CompanyNode), (j:JobOfferNode) WHERE c.username = $company AND j.position = $position AND j.company = $company CREATE (c)-[r:OFFERS_JOB]->(j)"
+	query := "MATCH (c:CompanyNode), (j:JobOfferNode) WHERE c.name = $company AND j.position = $position AND j.company = $company CREATE (c)-[r:OFFERS_JOB]->(j)"
 	parameters := map[string]interface{}{
-		"company":  company.Username,
+		"company":  company.CompanyName,
 		"position": offer.Position,
 	}
 	_, err := tx.Run(query, parameters)
@@ -337,7 +338,7 @@ func (u *ConnectionNeo4jStore) persistConnectionBetweenRequiredSkillAndJobOffer(
 	parameters := map[string]interface{}{
 		"skill":    skill,
 		"position": offer.Position,
-		"company":  offer.Company.Username,
+		"company":  offer.Company.CompanyName,
 	}
 	_, err := tx.Run(query, parameters)
 	return nil, err
@@ -387,7 +388,7 @@ func (u *ConnectionNeo4jStore) findSuggestedConnectionsForUser(tx neo4j.Transact
 
 func (u *ConnectionNeo4jStore) findSuggestedJobOffersBasedOnUserSkills(tx neo4j.Transaction, username string) ([]*domain.JobOffer, error) {
 	records, err := tx.Run(
-		"MATCH (u:RegisteredUserNode {username: $username})-[r1:HAS_SKILL]->(skill)<-[r2:REQUIRES_SKILL]-(jobOffer) RETURN DISTINCT jobOffer as job",
+		"MATCH (u:RegisteredUserNode {username: $username})-[r1:HAS_SKILL]->(skill)<-[r2:REQUIRES_SKILL]-(jobOffer) RETURN DISTINCT jobOffer.id as id, jobOffer.company as company, jobOffer.description as description, jobOffer.position as position, jobOffer.type as type",
 		map[string]interface{}{
 			"username": username,
 		},
@@ -399,9 +400,11 @@ func (u *ConnectionNeo4jStore) findSuggestedJobOffersBasedOnUserSkills(tx neo4j.
 	var jobOffers = []*domain.JobOffer{}
 	for records.Next() {
 		record := records.Record()
-		job, _ := record.Get("job")
-		jobOffer := job.(*domain.JobOffer)
-		//skill, _ := record.Get("skill")
+		var jobOffer = &domain.JobOffer{}
+		jobOffer.Company.CompanyName, _ = record.Values[1].(string)
+		jobOffer.JobDescription, _ = record.Values[2].(string)
+		jobOffer.Position, _ = record.Values[3].(string)
+		jobOffer.EmploymentType, _ = record.Values[4].(enum.EmploymentType)
 		jobOffers = append(jobOffers, jobOffer)
 	}
 

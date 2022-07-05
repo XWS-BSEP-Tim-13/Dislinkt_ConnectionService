@@ -197,17 +197,7 @@ func (service *ConnectionService) CheckIfUserConnected(fromUsername, toUsername 
 	return enum.NONE
 }
 
-func (service *ConnectionService) GetSuggestedConnectionUsernamesForUser(username string) ([]string, error) {
-	var retVal []string
-	connections, _ := service.connectionNeo4j.FindSuggestedConnectionsForUser(username)
-	for _, connUsername := range connections {
-		retVal = append(retVal, connUsername)
-	}
-
-	return retVal, nil
-}
-
-func (service *ConnectionService) SuggestJobOffersBasedOnUserSkills(username string) ([]*domain.JobOffer, interface{}) {
+func (service *ConnectionService) SuggestJobOffersBasedOnUserSkills(username string) ([]*domain.JobOffer, error) {
 	var retVal []*domain.JobOffer
 	jobOffers, _ := service.connectionNeo4j.FindSuggestedJobOffersBasedOnUserSkills(username)
 	for _, jobOffer := range jobOffers {

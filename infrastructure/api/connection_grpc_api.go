@@ -121,6 +121,26 @@ func (handler *ConnectionHandler) GetSuggestedConnectionUsernamesForUser(ctx con
 	return response, nil
 }
 
+func (handler *ConnectionHandler) FindJobOffersBasedOnUserSkills(ctx context.Context, request *pb.UserUsername) (*pb.JobOffers, error) {
+	username, _ := jwt.ExtractUsernameFromToken(ctx)
+	jobs, err := handler.service.SuggestJobOffersBasedOnUserSkills(username)
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.JobOffers{
+		JobOffers: []*pb.JobOffer{},
+	}
+
+	for _, offer := range jobs {
+		current := mapJobOfferToPB(offer)
+		response.JobOffers = append(response.JobOffers, current)
+	}
+
+	return response, nil
+}
+
 func (handler *ConnectionHandler) UnBlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
 	usernameTo, err := jwt.ExtractUsernameFromToken(ctx)
 	err = handler.service.UnblockUser(request.Username, usernameTo)
