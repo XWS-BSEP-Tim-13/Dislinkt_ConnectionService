@@ -33,6 +33,7 @@ type ConnectionServiceClient interface {
 	CheckIfUserConnected(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*ConnectionStatusResponse, error)
 	BlockUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*GetAllRequest, error)
 	UnBlockUser(ctx context.Context, in *UserUsername, opts ...grpc.CallOption) (*GetAllRequest, error)
+	GetEvents(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*Events, error)
 }
 
 type connectionServiceClient struct {
@@ -142,6 +143,15 @@ func (c *connectionServiceClient) UnBlockUser(ctx context.Context, in *UserUsern
 	return out, nil
 }
 
+func (c *connectionServiceClient) GetEvents(ctx context.Context, in *EventRequest, opts ...grpc.CallOption) (*Events, error) {
+	out := new(Events)
+	err := c.cc.Invoke(ctx, "/connection.ConnectionService/GetEvents", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConnectionServiceServer is the server API for ConnectionService service.
 // All implementations must embed UnimplementedConnectionServiceServer
 // for forward compatibility
@@ -157,6 +167,7 @@ type ConnectionServiceServer interface {
 	CheckIfUserConnected(context.Context, *UserUsername) (*ConnectionStatusResponse, error)
 	BlockUser(context.Context, *UserUsername) (*GetAllRequest, error)
 	UnBlockUser(context.Context, *UserUsername) (*GetAllRequest, error)
+	GetEvents(context.Context, *EventRequest) (*Events, error)
 	mustEmbedUnimplementedConnectionServiceServer()
 }
 
@@ -196,6 +207,9 @@ func (UnimplementedConnectionServiceServer) BlockUser(context.Context, *UserUser
 }
 func (UnimplementedConnectionServiceServer) UnBlockUser(context.Context, *UserUsername) (*GetAllRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnBlockUser not implemented")
+}
+func (UnimplementedConnectionServiceServer) GetEvents(context.Context, *EventRequest) (*Events, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEvents not implemented")
 }
 func (UnimplementedConnectionServiceServer) mustEmbedUnimplementedConnectionServiceServer() {}
 
@@ -408,6 +422,24 @@ func _ConnectionService_UnBlockUser_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConnectionService_GetEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConnectionServiceServer).GetEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/connection.ConnectionService/GetEvents",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConnectionServiceServer).GetEvents(ctx, req.(*EventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConnectionService_ServiceDesc is the grpc.ServiceDesc for ConnectionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -458,6 +490,10 @@ var ConnectionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UnBlockUser",
 			Handler:    _ConnectionService_UnBlockUser_Handler,
+		},
+		{
+			MethodName: "GetEvents",
+			Handler:    _ConnectionService_GetEvents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

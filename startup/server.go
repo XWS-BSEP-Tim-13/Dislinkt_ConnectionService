@@ -49,7 +49,8 @@ func (server *Server) Start() {
 	commandSubscriber := server.initSubscriber(server.config.BlockUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.BlockUserReplySubject)
 
-	server.initEventService(eventStore)
+	eventService := server.initEventService(eventStore)
+	server.initEventHandler(eventService)
 
 	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore, createBlockOrchestrator, eventStore)
 	server.initBlockUserHandler(connectionService, replyPublisher, commandSubscriber)
@@ -189,6 +190,10 @@ func (server *Server) initConnectionHandler(service *application.ConnectionServi
 
 func (server *Server) initEventService(store domain.EventStore) *application.EventService {
 	return application.NewEventService(store)
+}
+
+func (server *Server) initEventHandler(service *application.EventService) *api.EventsHandler {
+	return api.NewEventsHandler(service)
 }
 
 func (server *Server) startGrpcServer(productHandler *api.ConnectionHandler) {
