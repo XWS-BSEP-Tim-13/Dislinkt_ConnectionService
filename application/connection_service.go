@@ -222,3 +222,7 @@ func (service *ConnectionService) SuggestJobOffersBasedOnUserSkills(username str
 
 	return retVal, nil
 }
+
+func (service *ConnectionService) GetAllEvents() ([]*domain.Event, error) {
+	return service.eventStore.GetAll()
+}
