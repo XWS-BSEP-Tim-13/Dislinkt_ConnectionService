@@ -1,16 +1,19 @@
 package domain
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"context"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type UserStore interface {
-	GetActiveById(id primitive.ObjectID) (*RegisteredUser, error)
-	GetAllActive() ([]*RegisteredUser, error)
-	GetActiveByUsername(username string) (*RegisteredUser, error)
-	GetByUsername(username string) (*RegisteredUser, error)
-	Update(user *RegisteredUser) error
-	Insert(company *RegisteredUser) error
-	DeleteAll()
-	CheckIfUsersConnected(fromUsername, toUsername string) (*RegisteredUser, error)
-	CheckIfUserIsBlocked(fromUsername, toUsername string) (*RegisteredUser, error)
-	UpdateBlockedList(user *RegisteredUser) error
+	GetActiveById(ctx context.Context, id primitive.ObjectID) (*RegisteredUser, error)
+	GetAllActive(ctx context.Context) ([]*RegisteredUser, error)
+	GetActiveByUsername(ctx context.Context, username string) (*RegisteredUser, error)
+	GetByUsername(ctx context.Context, username string) (*RegisteredUser, error)
+	Update(ctx context.Context, user *RegisteredUser) error
+	Insert(ctx context.Context, company *RegisteredUser) error
+	DeleteAll(ctx context.Context)
+	CheckIfUsersConnected(ctx context.Context, fromUsername, toUsername string) (*RegisteredUser, error)
+	CheckIfUserIsBlocked(ctx context.Context, fromUsername, toUsername string) (*RegisteredUser, error)
+	UpdateBlockedList(ctx context.Context, user *RegisteredUser) error
 }
