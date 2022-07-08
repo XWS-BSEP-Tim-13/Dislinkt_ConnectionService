@@ -38,6 +38,7 @@ func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
 	connectionStore := server.initConnectionStore(mongoClient)
 	userStore := server.initUserStore(mongoClient)
+	eventStore := server.initEventStore(mongoClient)
 	neo4jDriver := server.initNeo4jDriver()
 	neo4jConnectionStore := server.initNeo4jConnectionStore(neo4jDriver)
 	seedConnectionStore(neo4jConnectionStore, userStore)
@@ -48,7 +49,9 @@ func (server *Server) Start() {
 	commandSubscriber := server.initSubscriber(server.config.BlockUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.BlockUserReplySubject)
 
-	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore, createBlockOrchestrator)
+	server.initEventService(eventStore)
+
+	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore, createBlockOrchestrator, eventStore)
 	server.initBlockUserHandler(connectionService, replyPublisher, commandSubscriber)
 
 	connectionHandler := server.initConnectionHandler(connectionService)
@@ -74,6 +77,18 @@ func (server *Server) initConnectionStore(client *mongo.Client) domain.Connectio
 		}
 	}
 
+	return store
+}
+
+func (server *Server) initEventStore(client *mongo.Client) domain.EventStore {
+	store := persistence.NewEventMongoDBStore(client)
+	store.DeleteAll()
+	for _, event := range events {
+		err := store.Insert(event)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	return store
 }
 
@@ -164,12 +179,16 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 	connStore.AddRequiredSkillToJobOffer("Java", jobs[1])
 }
 
-func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore, orchestrator *application.BlockUserOrchestrator) *application.ConnectionService {
-	return application.NewConnectionService(store, userStore, neo4jStore, orchestrator)
+func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore, orchestrator *application.BlockUserOrchestrator, eventStore domain.EventStore) *application.ConnectionService {
+	return application.NewConnectionService(store, userStore, neo4jStore, orchestrator, eventStore)
 }
 
 func (server *Server) initConnectionHandler(service *application.ConnectionService) *api.ConnectionHandler {
 	return api.NewCompanyHandler(service)
+}
+
+func (server *Server) initEventService(store domain.EventStore) *application.EventService {
+	return application.NewEventService(store)
 }
 
 func (server *Server) startGrpcServer(productHandler *api.ConnectionHandler) {

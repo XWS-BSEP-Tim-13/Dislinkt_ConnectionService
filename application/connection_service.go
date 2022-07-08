@@ -14,12 +14,15 @@ type ConnectionService struct {
 	userStore       domain.UserStore
 	connectionNeo4j persistence.ConnectionNeo4jStore
 	orchestrator    *BlockUserOrchestrator
+	eventStore      domain.EventStore
 }
 
-func NewConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4j persistence.ConnectionNeo4jStore, orchestrator *BlockUserOrchestrator) *ConnectionService {
+func NewConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4j persistence.ConnectionNeo4jStore,
+	orchestrator *BlockUserOrchestrator, eventStore domain.EventStore) *ConnectionService {
 	return &ConnectionService{
 		store:           store,
 		userStore:       userStore,
+		eventStore:      eventStore,
 		connectionNeo4j: neo4j,
 		orchestrator:    orchestrator,
 	}
@@ -49,6 +52,9 @@ func (service *ConnectionService) RequestConnection(usernameFrom, usernameTo str
 		service.userStore.Update(toUser)
 		service.connectionNeo4j.CreateConnectionBetweenUsers(toUser, fromUser)
 	}
+	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameFrom, Action: `Create connection request to user ` + usernameTo, Published: time.Now()}
+	service.eventStore.Insert(&event)
+
 	fmt.Printf("Saved to db: \n")
 	return ret, nil
 }
@@ -96,6 +102,8 @@ func (service *ConnectionService) AcceptConnection(usernameFrom, usernameTo stri
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
 	service.connectionNeo4j.CreateConnectionBetweenUsers(&connection.From, &connection.To)
 	service.store.Delete(connection.Id)
+	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameTo, Action: `Accepted connection request from user ` + usernameFrom, Published: time.Now()}
+	service.eventStore.Insert(&event)
 	return nil
 }
 
@@ -121,6 +129,8 @@ func (service *ConnectionService) DeleteConnection(usernameFrom, usernameTo stri
 	err = service.userStore.Update(user)
 	fmt.Println("Delete stared...", usernameTo)
 	service.connectionNeo4j.DeleteConnection(usernameFrom, usernameTo)
+	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameTo, Action: `Delete connection ` + usernameFrom, Published: time.Now()}
+	service.eventStore.Insert(&event)
 	return nil
 }
 
@@ -144,6 +154,8 @@ func (service *ConnectionService) UnblockUser(usernameFrom, usernameTo string) e
 	user.BlockedUsers[indx] = user.BlockedUsers[len(user.BlockedUsers)-1]
 	user.BlockedUsers = user.BlockedUsers[:len(user.BlockedUsers)-1]
 	err = service.userStore.Update(user)
+	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameFrom, Action: `Unblocked user ` + usernameTo, Published: time.Now()}
+	service.eventStore.Insert(&event)
 	return nil
 }
 
@@ -151,6 +163,8 @@ func (service *ConnectionService) DeleteConnectionRequest(usernameFrom, username
 	fmt.Println("delete connection request", usernameTo, usernameFrom)
 	request, _ := service.store.GetConnectionByUsernames(usernameFrom, usernameTo)
 	service.store.Delete(request.Id)
+	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameTo, Action: `Delete connection request from  ` + usernameFrom, Published: time.Now()}
+	service.eventStore.Insert(&event)
 }
 
 func (service *ConnectionService) GetRequestsForUser(username string) ([]*domain.ConnectionRequest, error) {
@@ -166,6 +180,8 @@ func (service *ConnectionService) BlockUser(usernameFrom, usernameTo string) err
 		return err
 	}
 	user.BlockedUsers = append(user.BlockedUsers, usernameTo)
+	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameFrom, Action: `Blocked user ` + usernameTo, Published: time.Now()}
+	service.eventStore.Insert(&event)
 	err = service.userStore.UpdateBlockedList(user)
 	if err != nil {
 		return err
