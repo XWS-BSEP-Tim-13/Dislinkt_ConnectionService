@@ -45,8 +45,8 @@ func (service *ConnectionService) RequestConnection(usernameFrom, usernameTo str
 		service.store.Insert(&request)
 	} else {
 		fmt.Println("Is not")
-		toUser.Connections = append(toUser.Connections, usernameFrom)
-		service.userStore.Update(toUser)
+		fromUser.Connections = append(fromUser.Connections, usernameTo)
+		service.userStore.Update(fromUser)
 		service.connectionNeo4j.CreateConnectionBetweenUsers(toUser, fromUser)
 	}
 	fmt.Printf("Saved to db: \n")
