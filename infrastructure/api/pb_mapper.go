@@ -105,3 +105,13 @@ func mapConnectionRequestToPB(request *domain.ConnectionRequest) *pb.ConnectionR
 	}
 	return connectionPb
 }
+
+func mapEventToPB(request *domain.Event) *pb.Event {
+	eventPb := &pb.Event{
+		Id:        request.Id.Hex(),
+		Action:    request.Action,
+		User:      request.User,
+		Published: timestamppb.New(request.Published),
+	}
+	return eventPb
+}

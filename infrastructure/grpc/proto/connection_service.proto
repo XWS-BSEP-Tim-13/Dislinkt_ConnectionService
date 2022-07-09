@@ -70,6 +70,11 @@ service ConnectionService{
     };
   }
 
+  rpc GetEvents(EventRequest)returns(Events){
+    option(google.api.http) = {
+      get: "/conn/events",
+    };
+  }
 }
 
 message GetRequest {
@@ -126,6 +131,20 @@ message JobOffer {
 
 message JobOffers {
   repeated JobOffer jobOffers = 1;
+}
+
+message EventRequest {
+}
+
+message Event {
+  string id = 1;
+  string action = 2;
+  string user = 3;
+  google.protobuf.Timestamp published = 4;
+}
+
+message Events {
+  repeated Event events = 1;
 }
 
 enum EmploymentType {

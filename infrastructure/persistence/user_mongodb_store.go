@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/domain"
+	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/tracer"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,31 +26,56 @@ func NewUserMongoDBStore(client *mongo.Client) domain.UserStore {
 	}
 }
 
-func (store *UserMongoDBStore) GetActiveById(id primitive.ObjectID) (*domain.RegisteredUser, error) {
+func (store *UserMongoDBStore) GetActiveById(ctx context.Context, id primitive.ObjectID) (*domain.RegisteredUser, error) {
+	span := tracer.StartSpanFromContext(ctx, "DB GetActiveById")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	filter := bson.M{"_id": id}
-	return store.filterOne(filter)
+	return store.filterOne(ctx, filter)
 }
 
-func (store *UserMongoDBStore) GetAllActive() ([]*domain.RegisteredUser, error) {
+func (store *UserMongoDBStore) GetAllActive(ctx context.Context) ([]*domain.RegisteredUser, error) {
+	span := tracer.StartSpanFromContext(ctx, "DB GetAllActive")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	filter := bson.D{{}}
-	return store.filter(filter)
+	return store.filter(ctx, filter)
 }
 
-func (store *UserMongoDBStore) GetActiveByUsername(username string) (*domain.RegisteredUser, error) {
+func (store *UserMongoDBStore) GetActiveByUsername(ctx context.Context, username string) (*domain.RegisteredUser, error) {
+	span := tracer.StartSpanFromContext(ctx, "DB GetActiveByUsername")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	filter := bson.M{"username": username}
-	return store.filterOne(filter)
+	return store.filterOne(ctx, filter)
 }
 
-func (store *UserMongoDBStore) GetByUsername(username string) (*domain.RegisteredUser, error) {
+func (store *UserMongoDBStore) GetByUsername(ctx context.Context, username string) (*domain.RegisteredUser, error) {
+	span := tracer.StartSpanFromContext(ctx, "DB GetByUsername")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	filter := bson.M{"username": username}
-	return store.filterOne(filter)
+	return store.filterOne(ctx, filter)
 }
 
-func (store *UserMongoDBStore) Update(user *domain.RegisteredUser) (err error) {
+func (store *UserMongoDBStore) Update(ctx context.Context, user *domain.RegisteredUser) (err error) {
+	span := tracer.StartSpanFromContext(ctx, "DB Update")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	fmt.Printf("Updating user %s %s\n", user.FirstName, user.Connections)
 	filter := bson.M{"_id": user.Id}
 	replacementObj := user
-	_, err = store.users.ReplaceOne(context.TODO(), filter, replacementObj)
+	_, err = store.users.ReplaceOne(ctx, filter, replacementObj)
 	fmt.Printf("Updated \n")
 	if err != nil {
 		return err
@@ -57,8 +83,13 @@ func (store *UserMongoDBStore) Update(user *domain.RegisteredUser) (err error) {
 	return nil
 }
 
-func (store *UserMongoDBStore) Insert(user *domain.RegisteredUser) error {
-	result, err := store.users.InsertOne(context.TODO(), user)
+func (store *UserMongoDBStore) Insert(ctx context.Context, user *domain.RegisteredUser) error {
+	span := tracer.StartSpanFromContext(ctx, "DB Insert")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
+	result, err := store.users.InsertOne(ctx, user)
 	if err != nil {
 		return err
 	}
@@ -66,14 +97,24 @@ func (store *UserMongoDBStore) Insert(user *domain.RegisteredUser) error {
 	return nil
 }
 
-func (store *UserMongoDBStore) CheckIfUsersConnected(fromUsername, toUsername string) (*domain.RegisteredUser, error) {
+func (store *UserMongoDBStore) CheckIfUsersConnected(ctx context.Context, fromUsername, toUsername string) (*domain.RegisteredUser, error) {
+	span := tracer.StartSpanFromContext(ctx, "DB CheckIfUsersConnected")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	filter := bson.M{"connections": fromUsername, "username": toUsername}
-	return store.filterOne(filter)
+	return store.filterOne(ctx, filter)
 }
 
-func (store *UserMongoDBStore) UpdateBlockedList(user *domain.RegisteredUser) error {
+func (store *UserMongoDBStore) UpdateBlockedList(ctx context.Context, user *domain.RegisteredUser) error {
+	span := tracer.StartSpanFromContext(ctx, "DB UpdateBlockedList")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	_, err := store.users.UpdateOne(
-		context.TODO(),
+		ctx,
 		bson.M{"_id": user.Id, "is_active": true},
 		bson.D{
 			{"$set", bson.D{{"blocked_users", user.BlockedUsers}}},
@@ -82,18 +123,33 @@ func (store *UserMongoDBStore) UpdateBlockedList(user *domain.RegisteredUser) er
 	return err
 }
 
-func (store *UserMongoDBStore) CheckIfUserIsBlocked(fromUsername, toUsername string) (*domain.RegisteredUser, error) {
+func (store *UserMongoDBStore) CheckIfUserIsBlocked(ctx context.Context, fromUsername, toUsername string) (*domain.RegisteredUser, error) {
+	span := tracer.StartSpanFromContext(ctx, "DB CheckIfUserIsBlocked")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
 	filter := bson.M{"blocked_users": fromUsername, "username": toUsername}
-	return store.filterOne(filter)
+	return store.filterOne(ctx, filter)
 }
 
-func (store *UserMongoDBStore) DeleteAll() {
-	store.users.DeleteMany(context.TODO(), bson.D{{}})
+func (store *UserMongoDBStore) DeleteAll(ctx context.Context) {
+	span := tracer.StartSpanFromContext(ctx, "DB DeleteAll")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
+	store.users.DeleteMany(ctx, bson.D{{}})
 }
 
-func (store *UserMongoDBStore) filter(filter interface{}) ([]*domain.RegisteredUser, error) {
-	cursor, err := store.users.Find(context.TODO(), filter)
-	defer cursor.Close(context.TODO())
+func (store *UserMongoDBStore) filter(ctx context.Context, filter interface{}) ([]*domain.RegisteredUser, error) {
+	span := tracer.StartSpanFromContext(ctx, "DB filter")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
+	cursor, err := store.users.Find(ctx, filter)
+	defer cursor.Close(ctx)
 
 	if err != nil {
 		return nil, err
@@ -101,8 +157,13 @@ func (store *UserMongoDBStore) filter(filter interface{}) ([]*domain.RegisteredU
 	return decode(cursor)
 }
 
-func (store *UserMongoDBStore) filterOne(filter interface{}) (user *domain.RegisteredUser, err error) {
-	result := store.users.FindOne(context.TODO(), filter)
+func (store *UserMongoDBStore) filterOne(ctx context.Context, filter interface{}) (user *domain.RegisteredUser, err error) {
+	span := tracer.StartSpanFromContext(ctx, "DB filterOne")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
+	result := store.users.FindOne(ctx, filter)
 	err = result.Decode(&user)
 	return
 }

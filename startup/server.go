@@ -1,6 +1,7 @@
 package startup
 
 import (
+	"context"
 	"fmt"
 	saga "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging/nats"
@@ -10,15 +11,21 @@ import (
 	connection "github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/grpc/proto"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/persistence"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/startup/config"
+	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/tracer"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
+	otgrpc "github.com/opentracing-contrib/go-grpc"
+	otgo "github.com/opentracing/opentracing-go"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
+	"io"
 	"log"
 	"net"
 )
 
 type Server struct {
 	config *config.Config
+	tracer otgo.Tracer
+	closer io.Closer
 }
 
 const (
@@ -29,8 +36,13 @@ const (
 )
 
 func NewServer(config *config.Config) *Server {
+	tracer, closer := tracer.Init()
+	otgo.SetGlobalTracer(tracer)
+
 	return &Server{
 		config: config,
+		tracer: tracer,
+		closer: closer,
 	}
 }
 
@@ -38,6 +50,7 @@ func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
 	connectionStore := server.initConnectionStore(mongoClient)
 	userStore := server.initUserStore(mongoClient)
+	eventStore := server.initEventStore(mongoClient)
 	neo4jDriver := server.initNeo4jDriver()
 	neo4jConnectionStore := server.initNeo4jConnectionStore(neo4jDriver)
 	seedConnectionStore(neo4jConnectionStore, userStore)
@@ -48,7 +61,10 @@ func (server *Server) Start() {
 	commandSubscriber := server.initSubscriber(server.config.BlockUserCommandSubject, QueueGroup)
 	replyPublisher := server.initPublisher(server.config.BlockUserReplySubject)
 
-	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore, createBlockOrchestrator)
+	eventService := server.initEventService(eventStore)
+	server.initEventHandler(eventService)
+
+	connectionService := server.initConnectionService(connectionStore, userStore, neo4jConnectionStore, createBlockOrchestrator, eventStore)
 	server.initBlockUserHandler(connectionService, replyPublisher, commandSubscriber)
 
 	connectionHandler := server.initConnectionHandler(connectionService)
@@ -65,15 +81,27 @@ func (server *Server) initMongoClient() *mongo.Client {
 
 func (server *Server) initConnectionStore(client *mongo.Client) domain.ConnectionStore {
 	store := persistence.NewConnectionMongoDBStore(client)
-	store.DeleteAll()
+	store.DeleteAll(context.TODO())
 
 	for _, connection := range connectionRequests {
-		err := store.Insert(connection)
+		err := store.Insert(context.TODO(), connection)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
+	return store
+}
+
+func (server *Server) initEventStore(client *mongo.Client) domain.EventStore {
+	store := persistence.NewEventMongoDBStore(client)
+	store.DeleteAll()
+	for _, event := range events {
+		err := store.Insert(event)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	return store
 }
 
@@ -114,9 +142,9 @@ func (server *Server) initBlockUserHandler(service *application.ConnectionServic
 
 func (server *Server) initUserStore(client *mongo.Client) domain.UserStore {
 	store := persistence.NewUserMongoDBStore(client)
-	store.DeleteAll()
+	store.DeleteAll(context.TODO())
 	for _, user := range users {
-		err := store.Insert(user)
+		err := store.Insert(context.TODO(), user)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -135,11 +163,11 @@ func (server *Server) initNeo4jConnectionStore(driver neo4j.Driver) persistence.
 }
 
 func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore domain.UserStore) {
-	userAna, _ := userStore.GetActiveByUsername("anagavrilovic")
-	userSrki, _ := userStore.GetActiveByUsername("srdjansukovic")
-	userLjuba, _ := userStore.GetActiveByUsername("stefanljubovic")
-	userMarija, _ := userStore.GetActiveByUsername("marijakljestan")
-	userLenka, _ := userStore.GetActiveByUsername("lenka")
+	userAna, _ := userStore.GetActiveByUsername(context.TODO(), "anagavrilovic")
+	userSrki, _ := userStore.GetActiveByUsername(context.TODO(), "srdjansukovic")
+	userLjuba, _ := userStore.GetActiveByUsername(context.TODO(), "stefanljubovic")
+	userMarija, _ := userStore.GetActiveByUsername(context.TODO(), "marijakljestan")
+	userLenka, _ := userStore.GetActiveByUsername(context.TODO(), "lenka")
 
 	connStore.CreateConnectionBetweenUsers(userSrki, userAna)
 	connStore.CreateConnectionBetweenUsers(userAna, userSrki)
@@ -164,12 +192,20 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 	connStore.AddRequiredSkillToJobOffer("Java", jobs[1])
 }
 
-func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore, orchestrator *application.BlockUserOrchestrator) *application.ConnectionService {
-	return application.NewConnectionService(store, userStore, neo4jStore, orchestrator)
+func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore, orchestrator *application.BlockUserOrchestrator, eventStore domain.EventStore) *application.ConnectionService {
+	return application.NewConnectionService(store, userStore, neo4jStore, orchestrator, eventStore)
 }
 
 func (server *Server) initConnectionHandler(service *application.ConnectionService) *api.ConnectionHandler {
 	return api.NewCompanyHandler(service)
+}
+
+func (server *Server) initEventService(store domain.EventStore) *application.EventService {
+	return application.NewEventService(store)
+}
+
+func (server *Server) initEventHandler(service *application.EventService) *api.EventsHandler {
+	return api.NewEventsHandler(service)
 }
 
 func (server *Server) startGrpcServer(productHandler *api.ConnectionHandler) {
@@ -192,17 +228,20 @@ func (server *Server) startGrpcServer(productHandler *api.ConnectionHandler) {
 		Certificates: []tls.Certificate{cert},
 		ClientAuth:   tls.RequestClientCert,
 		ClientCAs:    certPool,
-	}
+	}*/
 
 	opts := []grpc.ServerOption{
-		grpc.Creds(credentials.NewTLS(config)),
-	}*/
+		grpc.UnaryInterceptor(
+			otgrpc.OpenTracingServerInterceptor(server.tracer)),
+		grpc.StreamInterceptor(
+			otgrpc.OpenTracingStreamServerInterceptor(server.tracer)),
+	}
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(opts...)
 	connection.RegisterConnectionServiceServer(grpcServer, productHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
