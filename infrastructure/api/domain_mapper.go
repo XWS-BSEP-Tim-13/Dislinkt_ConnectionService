@@ -46,6 +46,31 @@ func mapJobOfferToDomain(jobOfferDto *pb.JobOffer) *domain.JobOffer {
 	return jobOffer
 }
 
+func mapJobOfferDtoToDomain(jobOfferDto *pb.JobOfferDto) *domain.JobOffer {
+	compId, _ := primitive.ObjectIDFromHex(jobOfferDto.Company.Id)
+	jobOffer := &domain.JobOffer{
+		Id: primitive.NewObjectID(),
+		Company: domain.Company{
+			Id:          compId,
+			CompanyName: jobOfferDto.Company.CompanyName,
+			Username:    jobOfferDto.Company.Username,
+			Email:       jobOfferDto.Company.Email,
+			PhoneNumber: jobOfferDto.Company.PhoneNumber,
+			Description: jobOfferDto.Company.Description,
+			Location:    jobOfferDto.Company.Location,
+			Website:     jobOfferDto.Company.Website,
+			CompanySize: jobOfferDto.Company.CompanySize,
+			Industry:    jobOfferDto.Company.Industry,
+		},
+		JobDescription: jobOfferDto.JobDescription,
+		Position:       jobOfferDto.Position,
+		Prerequisites:  jobOfferDto.Prerequisites,
+		EmploymentType: enum.EmploymentType(jobOfferDto.EmploymentType),
+		Published:      time.Now(),
+	}
+	return jobOffer
+}
+
 func mapUserToDomain(userPb *pb.User) *domain.RegisteredUser {
 	user := &domain.RegisteredUser{
 		Username:    (*userPb).Username,

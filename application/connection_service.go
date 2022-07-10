@@ -8,6 +8,7 @@ import (
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/persistence"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/tracer"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"strings"
 	"time"
 )
 
@@ -103,9 +104,29 @@ func (service *ConnectionService) GetConnectionSuggestionsForUser(ctx context.Co
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
 	var retVal []string
-	connections, _ := service.connectionNeo4j.FindSuggestedConnectionsForUser(username)
-	for _, connUsername := range connections {
-		retVal = append(retVal, connUsername)
+	suggestedConnections, _ := service.connectionNeo4j.FindSuggestedConnectionsForUser(username)
+
+	user, _ := service.userStore.GetActiveByUsername(ctx, username)
+	blockedUsers := user.BlockedUsers
+	connections := user.Connections
+	for _, connUsername := range suggestedConnections {
+		var result bool = false
+		for _, x := range blockedUsers {
+			if x == connUsername {
+				result = true
+				break
+			}
+		}
+
+		for _, x := range connections {
+			if x == connUsername {
+				result = true
+				break
+			}
+		}
+		if result == false {
+			retVal = append(retVal, connUsername)
+		}
 	}
 
 	return retVal, nil
@@ -162,7 +183,28 @@ func (service *ConnectionService) DeleteConnection(ctx context.Context, username
 	user.Connections = user.Connections[:len(user.Connections)-1]
 	err = service.userStore.Update(ctx, user)
 	fmt.Println("Delete stared...", usernameTo)
+	service.connectionNeo4j.DeleteConnection(usernameTo, usernameFrom)
+
+	userFrom, err := service.userStore.GetActiveByUsername(ctx, usernameFrom)
+	if err != nil {
+		return err
+	}
+	j := -1
+	for i, connection := range userFrom.Connections {
+		if connection == usernameTo {
+			j = i
+			break
+		}
+	}
+
+	if j == -1 {
+		return nil
+	}
+	userFrom.Connections[j] = userFrom.Connections[len(userFrom.Connections)-1]
+	userFrom.Connections = userFrom.Connections[:len(userFrom.Connections)-1]
+	err = service.userStore.Update(ctx, userFrom)
 	service.connectionNeo4j.DeleteConnection(usernameFrom, usernameTo)
+
 	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameTo, Action: `Delete connection ` + usernameFrom, Published: time.Now()}
 	service.eventStore.Insert(&event)
 	return nil
@@ -296,6 +338,41 @@ func (service *ConnectionService) SuggestJobOffersBasedOnUserSkills(ctx context.
 	return retVal, nil
 }
 
+func (service *ConnectionService) InsertJobOffer(ctx context.Context, job *domain.JobOffer) error {
+	span := tracer.StartSpanFromContext(ctx, "SERVICE InsertJobOffer")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	var company = &domain.Company{
+		Id:          getObjectId("623b0cc3a34d25d8567f9f82"),
+		CompanyName: "Levi9",
+		Username:    "levi9",
+		Email:       "levi9@levi9.com",
+		PhoneNumber: "0651234567",
+		Location:    "ns",
+		Description: "Technology services",
+		Website:     "www.levi9.com",
+		CompanySize: "1000",
+		Industry:    "IT",
+		IsActive:    true,
+	}
+
+	error := service.connectionNeo4j.AddJobOfferFromCompany(company, job)
+	skills := strings.Split(job.Prerequisites, ",")
+	for _, skill := range skills {
+		service.connectionNeo4j.AddRequiredSkillToJobOffer(skill, job)
+	}
+
+	return error
+}
+
 func (service *ConnectionService) GetAllEvents() ([]*domain.Event, error) {
 	return service.eventStore.GetAll()
+}
+
+func getObjectId(id string) primitive.ObjectID {
+	if objectId, err := primitive.ObjectIDFromHex(id); err == nil {
+		return objectId
+	}
+	return primitive.NewObjectID()
 }
