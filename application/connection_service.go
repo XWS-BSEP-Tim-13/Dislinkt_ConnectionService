@@ -208,7 +208,11 @@ func (service *ConnectionService) DeleteConnectionRequest(ctx context.Context, u
 
 	fmt.Println("delete connection request", usernameTo, usernameFrom)
 
-	request, _ := service.store.GetConnectionByUsernames(ctx, usernameFrom, usernameTo)
+	request, err := service.store.GetConnectionByUsernames(ctx, usernameFrom, usernameTo)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	service.store.Delete(ctx, request.Id)
 	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameTo, Action: `Delete connection request from  ` + usernameFrom, Published: time.Now()}
 	service.eventStore.Insert(&event)

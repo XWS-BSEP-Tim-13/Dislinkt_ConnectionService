@@ -33,7 +33,10 @@ func (store ConnectionsMongoDBStore) Delete(ctx context.Context, id primitive.Ob
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
 	filter := bson.M{"_id": id}
-	store.connections.DeleteOne(ctx, filter)
+	_, err := store.connections.DeleteOne(ctx, filter)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func (store ConnectionsMongoDBStore) GetRequestsForUser(ctx context.Context, username string) ([]*domain.ConnectionRequest, error) {

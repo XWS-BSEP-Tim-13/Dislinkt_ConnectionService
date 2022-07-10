@@ -67,7 +67,7 @@ func (handler *ConnectionHandler) DeleteConnectionRequest(ctx context.Context, r
 		return nil, err
 	}
 	fmt.Println("Delete con request started")
-	handler.service.DeleteConnectionRequest(ctx, username, request.Username)
+	handler.service.DeleteConnectionRequest(ctx, request.Username, username)
 	return new(pb.ConnectionResponse), nil
 }
 
