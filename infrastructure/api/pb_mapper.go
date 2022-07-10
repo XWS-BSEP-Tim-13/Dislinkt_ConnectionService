@@ -52,6 +52,7 @@ func mapUserToPB(user *domain.RegisteredUser) *pb.User {
 		DateOfBirth: timestamppb.New(user.DateOfBirth),
 		Biography:   user.Biography,
 		IsPrivate:   user.IsPrivate,
+		Username:    user.Username,
 	}
 
 	for _, experience := range user.Experiences {

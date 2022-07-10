@@ -35,9 +35,9 @@ func (service *ConnectionService) RequestConnection(ctx context.Context, usernam
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-
 	toUser, err := service.userStore.GetActiveByUsername(ctx, usernameTo)
 	fromUser, _ := service.userStore.GetActiveByUsername(ctx, usernameFrom)
+
 	ret := enum.CONNECTED
 	fmt.Println("Request", usernameTo, usernameFrom)
 	if err != nil {
@@ -57,6 +57,7 @@ func (service *ConnectionService) RequestConnection(ctx context.Context, usernam
 		fmt.Println("Is not")
 		fromUser.Connections = append(fromUser.Connections, usernameTo)
 		service.userStore.Update(ctx, fromUser)
+		fmt.Println(fromUser)
 		service.connectionNeo4j.CreateConnectionBetweenUsers(toUser, fromUser)
 	}
 	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameFrom, Action: `Create connection request to user ` + usernameTo, Published: time.Now()}
@@ -128,6 +129,7 @@ func (service *ConnectionService) AcceptConnection(ctx context.Context, username
 	connection.To.Connections = append(connection.To.Connections, connection.From.Username)
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
 	service.connectionNeo4j.CreateConnectionBetweenUsers(&connection.From, &connection.To)
+	service.connectionNeo4j.CreateConnectionBetweenUsers(&connection.To, &connection.From)
 	service.store.Delete(ctx, connection.Id)
 	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameTo, Action: `Accepted connection request from user ` + usernameFrom, Published: time.Now()}
 	service.eventStore.Insert(&event)
