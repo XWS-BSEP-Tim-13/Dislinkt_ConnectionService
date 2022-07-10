@@ -6,7 +6,6 @@ import (
 	events "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/block_user"
 	saga "github.com/XWS-BSEP-Tim-13/Dislinkt_APIGateway/saga/messaging"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/application"
-	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/tracer"
 )
 
 type BlockUserCommandHandler struct {
@@ -28,31 +27,26 @@ func NewBlockUserCommandHandler(orderService *application.ConnectionService, pub
 	return o, nil
 }
 
-func (handler *BlockUserCommandHandler) handle(ctx context.Context, command *events.BlockUserCommand) {
-	span := tracer.StartSpanFromContext(ctx, "API HandleBlockUserCommand")
-	defer span.Finish()
-
-	ctx = tracer.ContextWithSpan(context.Background(), span)
-
+func (handler *BlockUserCommandHandler) handle(command *events.BlockUserCommand) {
 	reply := events.BlockUserReply{Users: command.Users}
 
 	switch command.Type {
 	case events.RemoveConnectionFromUser:
-		err := handler.connectionService.DeleteConnection(ctx, reply.Users.UserFrom, reply.Users.UserTo)
+		err := handler.connectionService.DeleteConnection(context.TODO(), reply.Users.UserFrom, reply.Users.UserTo)
 		if err != nil {
 			return
 		}
 		reply.Type = events.RemoveConnectionFromUserUpdated
 		fmt.Println("Step 1")
 	case events.RemoveConnectionToUser:
-		err := handler.connectionService.DeleteConnection(ctx, reply.Users.UserTo, reply.Users.UserFrom)
+		err := handler.connectionService.DeleteConnection(context.TODO(), reply.Users.UserTo, reply.Users.UserFrom)
 		if err != nil {
 			return
 		}
 		reply.Type = events.RemoveConnectionToUserUpdated
 		fmt.Println("Step 2")
 	case events.BlockUser:
-		err := handler.connectionService.BlockUser(ctx, reply.Users.UserFrom, reply.Users.UserTo)
+		err := handler.connectionService.BlockUser(context.TODO(), reply.Users.UserFrom, reply.Users.UserTo)
 		reply.Type = events.UserBlocked
 		if err != nil {
 			reply.Type = events.ErrorOccured

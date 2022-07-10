@@ -56,12 +56,12 @@ func (handler *ConnectionHandler) AcceptConnectionRequest(ctx context.Context, r
 }
 
 func (handler *ConnectionHandler) DeleteConnectionRequest(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionResponse, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API DeleteConnectionRequest")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	username, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -72,12 +72,12 @@ func (handler *ConnectionHandler) DeleteConnectionRequest(ctx context.Context, r
 }
 
 func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionResponse, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API DeleteConnection")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	username, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -90,12 +90,12 @@ func (handler *ConnectionHandler) DeleteConnection(ctx context.Context, request 
 }
 
 func (handler *ConnectionHandler) RequestConnection(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionStatusResponse, error) {
+	username, _ := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API RequestConnection")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	username, _ := jwt.ExtractUsernameFromToken(ctx)
 	fmt.Println(request.Username)
 	ret, err := handler.service.RequestConnection(ctx, username, request.Username)
 	if err != nil {
@@ -110,12 +110,11 @@ func (handler *ConnectionHandler) RequestConnection(ctx context.Context, request
 }
 
 func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Context, request *pb.ConnectionResponse) (*pb.UserConnectionUsernames, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API GetConnectionUsernamesForUser")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-
-	username, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
 		response := &pb.UserConnectionUsernames{
 			Usernames: []string{},
@@ -134,12 +133,12 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 }
 
 func (handler *ConnectionHandler) GetSuggestedConnectionUsernamesForUser(ctx context.Context, request *pb.UserUsername) (*pb.UserConnectionUsernames, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API GetSuggestedConnectionUsernamesForUser")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	username, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
 		response := &pb.UserConnectionUsernames{
 			Usernames: []string{},
@@ -158,12 +157,12 @@ func (handler *ConnectionHandler) GetSuggestedConnectionUsernamesForUser(ctx con
 }
 
 func (handler *ConnectionHandler) FindJobOffersBasedOnUserSkills(ctx context.Context, request *pb.UserUsername) (*pb.JobOffers, error) {
+	username, _ := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API FindJobOffersBasedOnUserSkills")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	username, _ := jwt.ExtractUsernameFromToken(ctx)
 	jobs, err := handler.service.SuggestJobOffersBasedOnUserSkills(ctx, username)
 
 	if err != nil {
@@ -183,12 +182,12 @@ func (handler *ConnectionHandler) FindJobOffersBasedOnUserSkills(ctx context.Con
 }
 
 func (handler *ConnectionHandler) UnBlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
+	usernameTo, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API UnBlockUser")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	usernameTo, err := jwt.ExtractUsernameFromToken(ctx)
 	err = handler.service.UnblockUser(ctx, request.Username, usernameTo)
 	if err != nil {
 		fmt.Println(err)
@@ -199,13 +198,13 @@ func (handler *ConnectionHandler) UnBlockUser(ctx context.Context, request *pb.U
 }
 
 func (handler *ConnectionHandler) BlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
+	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API BlockUser")
 	defer span.Finish()
-
+	fmt.Println(usernameFrom)
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
 	fmt.Println("block started")
-	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
 		fmt.Println("Stopped on extracting username")
 		fmt.Println(err)
@@ -221,12 +220,12 @@ func (handler *ConnectionHandler) BlockUser(ctx context.Context, request *pb.Use
 }
 
 func (handler *ConnectionHandler) CheckIfUserConnected(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionStatusResponse, error) {
+	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API CheckIfUserConnected")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	usernameFrom, err := jwt.ExtractUsernameFromToken(ctx)
 	fmt.Println("Check has started", usernameFrom)
 	if err != nil {
 		fmt.Println(err)
