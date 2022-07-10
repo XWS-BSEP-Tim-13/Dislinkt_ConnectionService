@@ -352,7 +352,8 @@ func (service *ConnectionService) InsertJobOffer(ctx context.Context, job *domai
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
-	var company = &domain.Company{
+	var comp = job.Company
+	/*var company = &domain.Company{
 		Id:          getObjectId("623b0cc3a34d25d8567f9f82"),
 		CompanyName: "Levi9",
 		Username:    "levi9",
@@ -364,9 +365,8 @@ func (service *ConnectionService) InsertJobOffer(ctx context.Context, job *domai
 		CompanySize: "1000",
 		Industry:    "IT",
 		IsActive:    true,
-	}
-
-	error := service.connectionNeo4j.AddJobOfferFromCompany(company, job)
+	}*/
+	error := service.connectionNeo4j.AddJobOfferFromCompany(&comp, job)
 	skills := strings.Split(job.Prerequisites, ",")
 	for _, skill := range skills {
 		service.connectionNeo4j.AddRequiredSkillToJobOffer(skill, job)
