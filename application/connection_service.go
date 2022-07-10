@@ -108,6 +108,7 @@ func (service *ConnectionService) GetConnectionSuggestionsForUser(ctx context.Co
 
 	user, _ := service.userStore.GetActiveByUsername(ctx, username)
 	blockedUsers := user.BlockedUsers
+	fmt.Println(blockedUsers)
 	connections := user.Connections
 	for _, connUsername := range suggestedConnections {
 		var result bool = false
@@ -142,12 +143,20 @@ func (service *ConnectionService) AcceptConnection(ctx context.Context, username
 	if err != nil {
 		return err
 	}
-	user, err := service.userStore.GetByUsername(ctx, usernameTo)
+	user, err := service.userStore.GetActiveByUsername(ctx, usernameTo)
 	if err != nil {
 		return err
 	}
+
+	userFrom, err := service.userStore.GetActiveByUsername(ctx, usernameFrom)
+	if err != nil {
+		return err
+	}
+
 	user.Connections = append(user.Connections, usernameFrom)
-	connection.To.Connections = append(connection.To.Connections, connection.From.Username)
+	userFrom.Connections = append(userFrom.Connections, usernameTo)
+	service.userStore.Update(ctx, user)
+	service.userStore.Update(ctx, userFrom)
 	fmt.Printf("Saved connection %s \n", connection.To.Connections)
 	service.connectionNeo4j.CreateConnectionBetweenUsers(&connection.From, &connection.To)
 	service.connectionNeo4j.CreateConnectionBetweenUsers(&connection.To, &connection.From)

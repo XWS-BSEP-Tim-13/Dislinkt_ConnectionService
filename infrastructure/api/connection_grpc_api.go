@@ -40,12 +40,12 @@ func (handler *ConnectionHandler) GetRequestsForUser(ctx context.Context, reques
 }
 
 func (handler *ConnectionHandler) AcceptConnectionRequest(ctx context.Context, request *pb.UserUsername) (*pb.ConnectionResponse, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API AcceptConnectionRequest")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	username, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
