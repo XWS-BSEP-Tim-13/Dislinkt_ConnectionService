@@ -75,6 +75,13 @@ service ConnectionService{
       get: "/conn/events",
     };
   }
+
+  rpc CreateJobOffer(JobOfferRequest) returns(JobOfferResponse){
+    option (google.api.http) = {
+      post: "/conn/job-offer"
+      body: "dto"
+    };
+  }
 }
 
 message GetRequest {
@@ -131,6 +138,20 @@ message JobOffer {
 
 message JobOffers {
   repeated JobOffer jobOffers = 1;
+}
+
+message  JobOfferRequest{
+  JobOfferDto dto=1;
+}
+message  JobOfferDto{
+  string position = 1;
+  string jobDescription = 2;
+  string prerequisites = 3;
+  Company company = 4;
+  EmploymentType employment_type=5;
+}
+message  JobOfferResponse{
+  string id=1;
 }
 
 message EventRequest {
