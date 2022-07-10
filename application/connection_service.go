@@ -8,6 +8,7 @@ import (
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/persistence"
 	"github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/tracer"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"strings"
 	"time"
 )
 
@@ -352,7 +353,13 @@ func (service *ConnectionService) InsertJobOffer(ctx context.Context, job *domai
 		IsActive:    true,
 	}
 
-	return service.connectionNeo4j.AddJobOfferFromCompany(company, job)
+	error := service.connectionNeo4j.AddJobOfferFromCompany(company, job)
+	skills := strings.Split(job.Prerequisites, ",")
+	for _, skill := range skills {
+		service.connectionNeo4j.AddRequiredSkillToJobOffer(skill, job)
+	}
+
+	return error
 }
 
 func (service *ConnectionService) GetAllEvents() ([]*domain.Event, error) {
