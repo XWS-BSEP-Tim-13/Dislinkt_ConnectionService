@@ -181,16 +181,22 @@ func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore d
 	connStore.AddSkillToUser(userAna, "Docker")
 	connStore.AddSkillToUser(userMarija, "AWS")
 	connStore.AddSkillToUser(userMarija, "Docker")
+	connStore.AddSkillToUser(userLjuba, "React")
+	connStore.AddSkillToUser(userLjuba, "AWS")
+	connStore.AddSkillToUser(userSrki, "Mendix")
+	connStore.AddSkillToUser(userSrki, "Golang")
 
 	connStore.AddExperienceToUser(userMarija, &userMarija.Experiences[0])
 	connStore.AddExperienceToUser(userMarija, &userMarija.Experiences[1])
 
 	connStore.AddJobOfferFromCompany(companies[0], jobs[1])
+	connStore.AddJobOfferFromCompany(companies[0], jobs[2])
 	connStore.AddJobOfferFromCompany(companies[1], jobs[0])
 
 	connStore.AddRequiredSkillToJobOffer("AWS", jobs[0])
 	connStore.AddRequiredSkillToJobOffer("Docker", jobs[0])
 	connStore.AddRequiredSkillToJobOffer("Java", jobs[1])
+	connStore.AddRequiredSkillToJobOffer("Golang", jobs[2])
 }
 
 func (server *Server) initConnectionService(store domain.ConnectionStore, userStore domain.UserStore, neo4jStore persistence.ConnectionNeo4jStore, orchestrator *application.BlockUserOrchestrator, eventStore domain.EventStore) *application.ConnectionService {
