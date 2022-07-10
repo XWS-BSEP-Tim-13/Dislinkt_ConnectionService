@@ -163,6 +163,7 @@ func (server *Server) initNeo4jConnectionStore(driver neo4j.Driver) persistence.
 }
 
 func seedConnectionStore(connStore persistence.ConnectionNeo4jStore, userStore domain.UserStore) {
+	connStore.DeleteAll()
 	userAna, _ := userStore.GetActiveByUsername(context.TODO(), "anagavrilovic")
 	userSrki, _ := userStore.GetActiveByUsername(context.TODO(), "srdjansukovic")
 	userLjuba, _ := userStore.GetActiveByUsername(context.TODO(), "stefanljubovic")

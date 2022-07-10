@@ -116,6 +116,8 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
 	username, err := jwt.ExtractUsernameFromToken(ctx)
+	fmt.Println("fsdfsfds")
+	fmt.Println(username)
 	if err != nil {
 		response := &pb.UserConnectionUsernames{
 			Usernames: []string{},
@@ -134,12 +136,14 @@ func (handler *ConnectionHandler) GetConnectionUsernamesForUser(ctx context.Cont
 }
 
 func (handler *ConnectionHandler) GetSuggestedConnectionUsernamesForUser(ctx context.Context, request *pb.UserUsername) (*pb.UserConnectionUsernames, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
+
 	span := tracer.StartSpanFromContext(ctx, "API GetSuggestedConnectionUsernamesForUser")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	username, err := jwt.ExtractUsernameFromToken(ctx)
+	//username, err := jwt.ExtractUsernameFromToken(ctx)
 	if err != nil {
 		response := &pb.UserConnectionUsernames{
 			Usernames: []string{},
@@ -158,12 +162,14 @@ func (handler *ConnectionHandler) GetSuggestedConnectionUsernamesForUser(ctx con
 }
 
 func (handler *ConnectionHandler) FindJobOffersBasedOnUserSkills(ctx context.Context, request *pb.UserUsername) (*pb.JobOffers, error) {
+	username, err := jwt.ExtractUsernameFromToken(ctx)
+	
 	span := tracer.StartSpanFromContext(ctx, "API FindJobOffersBasedOnUserSkills")
 	defer span.Finish()
 
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
-	username, _ := jwt.ExtractUsernameFromToken(ctx)
+	//username, _ := jwt.ExtractUsernameFromToken(ctx)
 	jobs, err := handler.service.SuggestJobOffersBasedOnUserSkills(ctx, username)
 
 	if err != nil {

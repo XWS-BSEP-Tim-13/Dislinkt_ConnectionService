@@ -240,6 +240,21 @@ func (u *ConnectionNeo4jStore) DeleteConnection(usernameFrom string, usernameTo 
 	return nil, err
 }
 
+func (u *ConnectionNeo4jStore) DeleteAll() (ret interface{}, err error) {
+	session := u.Driver.NewSession(neo4j.SessionConfig{})
+	defer func() {
+		err = session.Close()
+	}()
+	_, err = session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r"
+		parameters := map[string]interface{}{}
+		_, err := tx.Run(query, parameters)
+		return nil, err
+	})
+
+	return nil, err
+}
+
 func (u *ConnectionNeo4jStore) persistUserAsNode(tx neo4j.Transaction, user *domain.RegisteredUser) (interface{}, error) {
 	query := "MERGE (:RegisteredUserNode {email: $email, username: $username})"
 	parameters := map[string]interface{}{
