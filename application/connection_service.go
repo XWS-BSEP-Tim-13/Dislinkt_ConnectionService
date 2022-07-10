@@ -333,6 +333,35 @@ func (service *ConnectionService) SuggestJobOffersBasedOnUserSkills(ctx context.
 	return retVal, nil
 }
 
+func (service *ConnectionService) InsertJobOffer(ctx context.Context, job *domain.JobOffer) error {
+	span := tracer.StartSpanFromContext(ctx, "SERVICE InsertJobOffer")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+	var company = &domain.Company{
+		Id:          getObjectId("623b0cc3a34d25d8567f9f82"),
+		CompanyName: "Levi9",
+		Username:    "levi9",
+		Email:       "levi9@levi9.com",
+		PhoneNumber: "0651234567",
+		Location:    "ns",
+		Description: "Technology services",
+		Website:     "www.levi9.com",
+		CompanySize: "1000",
+		Industry:    "IT",
+		IsActive:    true,
+	}
+
+	return service.connectionNeo4j.AddJobOfferFromCompany(company, job)
+}
+
 func (service *ConnectionService) GetAllEvents() ([]*domain.Event, error) {
 	return service.eventStore.GetAll()
+}
+
+func getObjectId(id string) primitive.ObjectID {
+	if objectId, err := primitive.ObjectIDFromHex(id); err == nil {
+		return objectId
+	}
+	return primitive.NewObjectID()
 }

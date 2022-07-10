@@ -189,6 +189,22 @@ func (handler *ConnectionHandler) FindJobOffersBasedOnUserSkills(ctx context.Con
 	return response, nil
 }
 
+func (handler *ConnectionHandler) CreateJobOffer(ctx context.Context, request *pb.JobOfferRequest) (*pb.GetRequest, error) {
+	span := tracer.StartSpanFromContext(ctx, "API CreateJobOffer")
+	defer span.Finish()
+
+	ctx = tracer.ContextWithSpan(context.Background(), span)
+
+	job := mapJobOfferDtoToDomain(request.Dto)
+	err := handler.service.InsertJobOffer(ctx, job)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.GetRequest{}
+	return response, nil
+}
+
 func (handler *ConnectionHandler) UnBlockUser(ctx context.Context, request *pb.UserUsername) (*pb.GetAllRequest, error) {
 	usernameTo, err := jwt.ExtractUsernameFromToken(ctx)
 	span := tracer.StartSpanFromContext(ctx, "API UnBlockUser")

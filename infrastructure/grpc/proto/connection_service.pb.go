@@ -172,7 +172,7 @@ func (x User_Gender) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use User_Gender.Descriptor instead.
 func (User_Gender) EnumDescriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{12, 0}
+	return file_connection_service_proto_rawDescGZIP(), []int{15, 0}
 }
 
 type Experience_EmploymentType int32
@@ -221,7 +221,7 @@ func (x Experience_EmploymentType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Experience_EmploymentType.Descriptor instead.
 func (Experience_EmploymentType) EnumDescriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{13, 0}
+	return file_connection_service_proto_rawDescGZIP(), []int{16, 0}
 }
 
 type Education_Degree int32
@@ -273,7 +273,7 @@ func (x Education_Degree) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Education_Degree.Descriptor instead.
 func (Education_Degree) EnumDescriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{14, 0}
+	return file_connection_service_proto_rawDescGZIP(), []int{17, 0}
 }
 
 type GetRequest struct {
@@ -802,6 +802,179 @@ func (x *JobOffers) GetJobOffers() []*JobOffer {
 	return nil
 }
 
+type JobOfferRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Dto *JobOfferDto `protobuf:"bytes,1,opt,name=dto,proto3" json:"dto,omitempty"`
+}
+
+func (x *JobOfferRequest) Reset() {
+	*x = JobOfferRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_connection_service_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *JobOfferRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JobOfferRequest) ProtoMessage() {}
+
+func (x *JobOfferRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_connection_service_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JobOfferRequest.ProtoReflect.Descriptor instead.
+func (*JobOfferRequest) Descriptor() ([]byte, []int) {
+	return file_connection_service_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *JobOfferRequest) GetDto() *JobOfferDto {
+	if x != nil {
+		return x.Dto
+	}
+	return nil
+}
+
+type JobOfferDto struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Position       string         `protobuf:"bytes,1,opt,name=position,proto3" json:"position,omitempty"`
+	JobDescription string         `protobuf:"bytes,2,opt,name=jobDescription,proto3" json:"jobDescription,omitempty"`
+	Prerequisites  string         `protobuf:"bytes,3,opt,name=prerequisites,proto3" json:"prerequisites,omitempty"`
+	Company        *Company       `protobuf:"bytes,4,opt,name=company,proto3" json:"company,omitempty"`
+	EmploymentType EmploymentType `protobuf:"varint,5,opt,name=employment_type,json=employmentType,proto3,enum=connection.EmploymentType" json:"employment_type,omitempty"`
+}
+
+func (x *JobOfferDto) Reset() {
+	*x = JobOfferDto{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_connection_service_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *JobOfferDto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JobOfferDto) ProtoMessage() {}
+
+func (x *JobOfferDto) ProtoReflect() protoreflect.Message {
+	mi := &file_connection_service_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JobOfferDto.ProtoReflect.Descriptor instead.
+func (*JobOfferDto) Descriptor() ([]byte, []int) {
+	return file_connection_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *JobOfferDto) GetPosition() string {
+	if x != nil {
+		return x.Position
+	}
+	return ""
+}
+
+func (x *JobOfferDto) GetJobDescription() string {
+	if x != nil {
+		return x.JobDescription
+	}
+	return ""
+}
+
+func (x *JobOfferDto) GetPrerequisites() string {
+	if x != nil {
+		return x.Prerequisites
+	}
+	return ""
+}
+
+func (x *JobOfferDto) GetCompany() *Company {
+	if x != nil {
+		return x.Company
+	}
+	return nil
+}
+
+func (x *JobOfferDto) GetEmploymentType() EmploymentType {
+	if x != nil {
+		return x.EmploymentType
+	}
+	return EmploymentType_FULL_TIME
+}
+
+type JobOfferResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *JobOfferResponse) Reset() {
+	*x = JobOfferResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_connection_service_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *JobOfferResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JobOfferResponse) ProtoMessage() {}
+
+func (x *JobOfferResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_connection_service_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JobOfferResponse.ProtoReflect.Descriptor instead.
+func (*JobOfferResponse) Descriptor() ([]byte, []int) {
+	return file_connection_service_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *JobOfferResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 type EventRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -811,7 +984,7 @@ type EventRequest struct {
 func (x *EventRequest) Reset() {
 	*x = EventRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[9]
+		mi := &file_connection_service_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -824,7 +997,7 @@ func (x *EventRequest) String() string {
 func (*EventRequest) ProtoMessage() {}
 
 func (x *EventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[9]
+	mi := &file_connection_service_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -837,7 +1010,7 @@ func (x *EventRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EventRequest.ProtoReflect.Descriptor instead.
 func (*EventRequest) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{9}
+	return file_connection_service_proto_rawDescGZIP(), []int{12}
 }
 
 type Event struct {
@@ -854,7 +1027,7 @@ type Event struct {
 func (x *Event) Reset() {
 	*x = Event{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[10]
+		mi := &file_connection_service_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -867,7 +1040,7 @@ func (x *Event) String() string {
 func (*Event) ProtoMessage() {}
 
 func (x *Event) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[10]
+	mi := &file_connection_service_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -880,7 +1053,7 @@ func (x *Event) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Event.ProtoReflect.Descriptor instead.
 func (*Event) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{10}
+	return file_connection_service_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *Event) GetId() string {
@@ -922,7 +1095,7 @@ type Events struct {
 func (x *Events) Reset() {
 	*x = Events{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[11]
+		mi := &file_connection_service_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -935,7 +1108,7 @@ func (x *Events) String() string {
 func (*Events) ProtoMessage() {}
 
 func (x *Events) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[11]
+	mi := &file_connection_service_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -948,7 +1121,7 @@ func (x *Events) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Events.ProtoReflect.Descriptor instead.
 func (*Events) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{11}
+	return file_connection_service_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *Events) GetEvents() []*Event {
@@ -983,7 +1156,7 @@ type User struct {
 func (x *User) Reset() {
 	*x = User{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[12]
+		mi := &file_connection_service_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -996,7 +1169,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[12]
+	mi := &file_connection_service_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1009,7 +1182,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{12}
+	return file_connection_service_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *User) GetId() string {
@@ -1137,7 +1310,7 @@ type Experience struct {
 func (x *Experience) Reset() {
 	*x = Experience{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[13]
+		mi := &file_connection_service_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1150,7 +1323,7 @@ func (x *Experience) String() string {
 func (*Experience) ProtoMessage() {}
 
 func (x *Experience) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[13]
+	mi := &file_connection_service_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1163,7 +1336,7 @@ func (x *Experience) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Experience.ProtoReflect.Descriptor instead.
 func (*Experience) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{13}
+	return file_connection_service_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *Experience) GetId() string {
@@ -1253,7 +1426,7 @@ type Education struct {
 func (x *Education) Reset() {
 	*x = Education{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[14]
+		mi := &file_connection_service_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1266,7 +1439,7 @@ func (x *Education) String() string {
 func (*Education) ProtoMessage() {}
 
 func (x *Education) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[14]
+	mi := &file_connection_service_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1279,7 +1452,7 @@ func (x *Education) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Education.ProtoReflect.Descriptor instead.
 func (*Education) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{14}
+	return file_connection_service_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *Education) GetId() string {
@@ -1342,7 +1515,7 @@ type ConnectionRequests struct {
 func (x *ConnectionRequests) Reset() {
 	*x = ConnectionRequests{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[15]
+		mi := &file_connection_service_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1355,7 +1528,7 @@ func (x *ConnectionRequests) String() string {
 func (*ConnectionRequests) ProtoMessage() {}
 
 func (x *ConnectionRequests) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[15]
+	mi := &file_connection_service_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1368,7 +1541,7 @@ func (x *ConnectionRequests) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectionRequests.ProtoReflect.Descriptor instead.
 func (*ConnectionRequests) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{15}
+	return file_connection_service_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ConnectionRequests) GetRequests() []*ConnectionRequest {
@@ -1392,7 +1565,7 @@ type ConnectionRequest struct {
 func (x *ConnectionRequest) Reset() {
 	*x = ConnectionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[16]
+		mi := &file_connection_service_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1405,7 +1578,7 @@ func (x *ConnectionRequest) String() string {
 func (*ConnectionRequest) ProtoMessage() {}
 
 func (x *ConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[16]
+	mi := &file_connection_service_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1418,7 +1591,7 @@ func (x *ConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectionRequest.ProtoReflect.Descriptor instead.
 func (*ConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{16}
+	return file_connection_service_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ConnectionRequest) GetId() string {
@@ -1458,7 +1631,7 @@ type ConnectionResponse struct {
 func (x *ConnectionResponse) Reset() {
 	*x = ConnectionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[17]
+		mi := &file_connection_service_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1471,7 +1644,7 @@ func (x *ConnectionResponse) String() string {
 func (*ConnectionResponse) ProtoMessage() {}
 
 func (x *ConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[17]
+	mi := &file_connection_service_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1484,7 +1657,7 @@ func (x *ConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectionResponse.ProtoReflect.Descriptor instead.
 func (*ConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{17}
+	return file_connection_service_proto_rawDescGZIP(), []int{20}
 }
 
 type ConnectionBody struct {
@@ -1498,7 +1671,7 @@ type ConnectionBody struct {
 func (x *ConnectionBody) Reset() {
 	*x = ConnectionBody{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[18]
+		mi := &file_connection_service_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1511,7 +1684,7 @@ func (x *ConnectionBody) String() string {
 func (*ConnectionBody) ProtoMessage() {}
 
 func (x *ConnectionBody) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[18]
+	mi := &file_connection_service_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1524,7 +1697,7 @@ func (x *ConnectionBody) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectionBody.ProtoReflect.Descriptor instead.
 func (*ConnectionBody) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{18}
+	return file_connection_service_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ConnectionBody) GetConnection() *Connection {
@@ -1546,7 +1719,7 @@ type Connection struct {
 func (x *Connection) Reset() {
 	*x = Connection{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[19]
+		mi := &file_connection_service_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1559,7 +1732,7 @@ func (x *Connection) String() string {
 func (*Connection) ProtoMessage() {}
 
 func (x *Connection) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[19]
+	mi := &file_connection_service_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1572,7 +1745,7 @@ func (x *Connection) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Connection.ProtoReflect.Descriptor instead.
 func (*Connection) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{19}
+	return file_connection_service_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *Connection) GetUsernameFrom() string {
@@ -1600,7 +1773,7 @@ type UserUsername struct {
 func (x *UserUsername) Reset() {
 	*x = UserUsername{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[20]
+		mi := &file_connection_service_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1613,7 +1786,7 @@ func (x *UserUsername) String() string {
 func (*UserUsername) ProtoMessage() {}
 
 func (x *UserUsername) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[20]
+	mi := &file_connection_service_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1626,7 +1799,7 @@ func (x *UserUsername) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserUsername.ProtoReflect.Descriptor instead.
 func (*UserUsername) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{20}
+	return file_connection_service_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *UserUsername) GetUsername() string {
@@ -1647,7 +1820,7 @@ type UserConnectionUsernames struct {
 func (x *UserConnectionUsernames) Reset() {
 	*x = UserConnectionUsernames{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_connection_service_proto_msgTypes[21]
+		mi := &file_connection_service_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1660,7 +1833,7 @@ func (x *UserConnectionUsernames) String() string {
 func (*UserConnectionUsernames) ProtoMessage() {}
 
 func (x *UserConnectionUsernames) ProtoReflect() protoreflect.Message {
-	mi := &file_connection_service_proto_msgTypes[21]
+	mi := &file_connection_service_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1673,7 +1846,7 @@ func (x *UserConnectionUsernames) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserConnectionUsernames.ProtoReflect.Descriptor instead.
 func (*UserConnectionUsernames) Descriptor() ([]byte, []int) {
-	return file_connection_service_proto_rawDescGZIP(), []int{21}
+	return file_connection_service_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *UserConnectionUsernames) GetUsernames() []string {
@@ -1751,7 +1924,28 @@ var file_connection_service_proto_rawDesc = []byte{
 	0x32, 0x0a, 0x09, 0x6a, 0x6f, 0x62, 0x4f, 0x66, 0x66, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03,
 	0x28, 0x0b, 0x32, 0x14, 0x2e, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e,
 	0x4a, 0x6f, 0x62, 0x4f, 0x66, 0x66, 0x65, 0x72, 0x52, 0x09, 0x6a, 0x6f, 0x62, 0x4f, 0x66, 0x66,
-	0x65, 0x72, 0x73, 0x22, 0x0e, 0x0a, 0x0c, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x72, 0x73, 0x22, 0x3c, 0x0a, 0x0f, 0x4a, 0x6f, 0x62, 0x4f, 0x66, 0x66, 0x65, 0x72, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x29, 0x0a, 0x03, 0x64, 0x74, 0x6f, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x2e, 0x4a, 0x6f, 0x62, 0x4f, 0x66, 0x66, 0x65, 0x72, 0x44, 0x74, 0x6f, 0x52, 0x03, 0x64, 0x74,
+	0x6f, 0x22, 0xeb, 0x01, 0x0a, 0x0b, 0x4a, 0x6f, 0x62, 0x4f, 0x66, 0x66, 0x65, 0x72, 0x44, 0x74,
+	0x6f, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x26, 0x0a,
+	0x0e, 0x6a, 0x6f, 0x62, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x6a, 0x6f, 0x62, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69,
+	0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x24, 0x0a, 0x0d, 0x70, 0x72, 0x65, 0x72, 0x65, 0x71, 0x75,
+	0x69, 0x73, 0x69, 0x74, 0x65, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x70, 0x72,
+	0x65, 0x72, 0x65, 0x71, 0x75, 0x69, 0x73, 0x69, 0x74, 0x65, 0x73, 0x12, 0x2d, 0x0a, 0x07, 0x63,
+	0x6f, 0x6d, 0x70, 0x61, 0x6e, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63,
+	0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x43, 0x6f, 0x6d, 0x70, 0x61, 0x6e,
+	0x79, 0x52, 0x07, 0x63, 0x6f, 0x6d, 0x70, 0x61, 0x6e, 0x79, 0x12, 0x43, 0x0a, 0x0f, 0x65, 0x6d,
+	0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x0e, 0x32, 0x1a, 0x2e, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x2e, 0x45, 0x6d, 0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x52,
+	0x0e, 0x65, 0x6d, 0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x22,
+	0x22, 0x0a, 0x10, 0x4a, 0x6f, 0x62, 0x4f, 0x66, 0x66, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x02, 0x69, 0x64, 0x22, 0x0e, 0x0a, 0x0c, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x22, 0x7d, 0x0a, 0x05, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02,
 	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06,
 	0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x63,
@@ -1895,7 +2089,7 @@ var file_connection_service_proto_rawDesc = []byte{
 	0x12, 0x0d, 0x0a, 0x09, 0x46, 0x55, 0x4c, 0x4c, 0x5f, 0x54, 0x49, 0x4d, 0x45, 0x10, 0x00, 0x12,
 	0x0d, 0x0a, 0x09, 0x50, 0x41, 0x52, 0x54, 0x5f, 0x54, 0x49, 0x4d, 0x45, 0x10, 0x01, 0x12, 0x0e,
 	0x0a, 0x0a, 0x49, 0x4e, 0x54, 0x45, 0x52, 0x4e, 0x53, 0x48, 0x49, 0x50, 0x10, 0x02, 0x12, 0x08,
-	0x0a, 0x04, 0x4e, 0x4f, 0x4e, 0x45, 0x10, 0x03, 0x32, 0x96, 0x0c, 0x0a, 0x11, 0x43, 0x6f, 0x6e,
+	0x0a, 0x04, 0x4e, 0x4f, 0x4e, 0x45, 0x10, 0x03, 0x32, 0xfb, 0x0c, 0x0a, 0x11, 0x43, 0x6f, 0x6e,
 	0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x89,
 	0x01, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x46, 0x6f,
 	0x72, 0x55, 0x73, 0x65, 0x72, 0x12, 0x1e, 0x2e, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69,
@@ -1993,12 +2187,19 @@ var file_connection_service_proto_rawDesc = []byte{
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63,
 	0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x22, 0x14, 0x82, 0xd3, 0xe4,
 	0x93, 0x02, 0x0e, 0x12, 0x0c, 0x2f, 0x63, 0x6f, 0x6e, 0x6e, 0x2f, 0x65, 0x76, 0x65, 0x6e, 0x74,
-	0x73, 0x42, 0x51, 0x5a, 0x4f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
-	0x58, 0x57, 0x53, 0x2d, 0x42, 0x53, 0x45, 0x50, 0x2d, 0x54, 0x69, 0x6d, 0x2d, 0x31, 0x33, 0x2f,
-	0x44, 0x69, 0x73, 0x6c, 0x69, 0x6e, 0x6b, 0x74, 0x5f, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74,
-	0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x69, 0x6e, 0x66, 0x72, 0x61,
-	0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x75, 0x72, 0x65, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x12, 0x63, 0x0a, 0x0e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4a, 0x6f, 0x62, 0x4f, 0x66,
+	0x66, 0x65, 0x72, 0x12, 0x1b, 0x2e, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x2e, 0x4a, 0x6f, 0x62, 0x4f, 0x66, 0x66, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x16, 0x2e, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x47, 0x65,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x1c, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x16,
+	0x22, 0x0f, 0x2f, 0x63, 0x6f, 0x6e, 0x6e, 0x2f, 0x6a, 0x6f, 0x62, 0x2d, 0x6f, 0x66, 0x66, 0x65,
+	0x72, 0x3a, 0x03, 0x64, 0x74, 0x6f, 0x42, 0x51, 0x5a, 0x4f, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x58, 0x57, 0x53, 0x2d, 0x42, 0x53, 0x45, 0x50, 0x2d, 0x54, 0x69,
+	0x6d, 0x2d, 0x31, 0x33, 0x2f, 0x44, 0x69, 0x73, 0x6c, 0x69, 0x6e, 0x6b, 0x74, 0x5f, 0x43, 0x6f,
+	0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f,
+	0x69, 0x6e, 0x66, 0x72, 0x61, 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x75, 0x72, 0x65, 0x2f, 0x67,
+	0x72, 0x70, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -2014,7 +2215,7 @@ func file_connection_service_proto_rawDescGZIP() []byte {
 }
 
 var file_connection_service_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_connection_service_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_connection_service_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_connection_service_proto_goTypes = []interface{}{
 	(ConnectionStatus)(0),            // 0: connection.ConnectionStatus
 	(EmploymentType)(0),              // 1: connection.EmploymentType
@@ -2030,20 +2231,23 @@ var file_connection_service_proto_goTypes = []interface{}{
 	(*Company)(nil),                  // 11: connection.Company
 	(*JobOffer)(nil),                 // 12: connection.JobOffer
 	(*JobOffers)(nil),                // 13: connection.JobOffers
-	(*EventRequest)(nil),             // 14: connection.EventRequest
-	(*Event)(nil),                    // 15: connection.Event
-	(*Events)(nil),                   // 16: connection.Events
-	(*User)(nil),                     // 17: connection.User
-	(*Experience)(nil),               // 18: connection.Experience
-	(*Education)(nil),                // 19: connection.Education
-	(*ConnectionRequests)(nil),       // 20: connection.ConnectionRequests
-	(*ConnectionRequest)(nil),        // 21: connection.ConnectionRequest
-	(*ConnectionResponse)(nil),       // 22: connection.ConnectionResponse
-	(*ConnectionBody)(nil),           // 23: connection.ConnectionBody
-	(*Connection)(nil),               // 24: connection.Connection
-	(*UserUsername)(nil),             // 25: connection.UserUsername
-	(*UserConnectionUsernames)(nil),  // 26: connection.UserConnectionUsernames
-	(*timestamppb.Timestamp)(nil),    // 27: google.protobuf.Timestamp
+	(*JobOfferRequest)(nil),          // 14: connection.JobOfferRequest
+	(*JobOfferDto)(nil),              // 15: connection.JobOfferDto
+	(*JobOfferResponse)(nil),         // 16: connection.JobOfferResponse
+	(*EventRequest)(nil),             // 17: connection.EventRequest
+	(*Event)(nil),                    // 18: connection.Event
+	(*Events)(nil),                   // 19: connection.Events
+	(*User)(nil),                     // 20: connection.User
+	(*Experience)(nil),               // 21: connection.Experience
+	(*Education)(nil),                // 22: connection.Education
+	(*ConnectionRequests)(nil),       // 23: connection.ConnectionRequests
+	(*ConnectionRequest)(nil),        // 24: connection.ConnectionRequest
+	(*ConnectionResponse)(nil),       // 25: connection.ConnectionResponse
+	(*ConnectionBody)(nil),           // 26: connection.ConnectionBody
+	(*Connection)(nil),               // 27: connection.Connection
+	(*UserUsername)(nil),             // 28: connection.UserUsername
+	(*UserConnectionUsernames)(nil),  // 29: connection.UserConnectionUsernames
+	(*timestamppb.Timestamp)(nil),    // 30: google.protobuf.Timestamp
 }
 var file_connection_service_proto_depIdxs = []int32{
 	11, // 0: connection.GetResponse.company:type_name -> connection.Company
@@ -2052,52 +2256,57 @@ var file_connection_service_proto_depIdxs = []int32{
 	11, // 3: connection.JobOffer.company:type_name -> connection.Company
 	1,  // 4: connection.JobOffer.employment_type:type_name -> connection.EmploymentType
 	12, // 5: connection.JobOffers.jobOffers:type_name -> connection.JobOffer
-	27, // 6: connection.Event.published:type_name -> google.protobuf.Timestamp
-	15, // 7: connection.Events.events:type_name -> connection.Event
-	2,  // 8: connection.User.gender:type_name -> connection.User.Gender
-	27, // 9: connection.User.dateOfBirth:type_name -> google.protobuf.Timestamp
-	18, // 10: connection.User.experiences:type_name -> connection.Experience
-	19, // 11: connection.User.educations:type_name -> connection.Education
-	3,  // 12: connection.Experience.employmentType:type_name -> connection.Experience.EmploymentType
-	27, // 13: connection.Experience.startDate:type_name -> google.protobuf.Timestamp
-	27, // 14: connection.Experience.endDate:type_name -> google.protobuf.Timestamp
-	4,  // 15: connection.Education.degree:type_name -> connection.Education.Degree
-	27, // 16: connection.Education.startDate:type_name -> google.protobuf.Timestamp
-	27, // 17: connection.Education.endDate:type_name -> google.protobuf.Timestamp
-	21, // 18: connection.ConnectionRequests.requests:type_name -> connection.ConnectionRequest
-	17, // 19: connection.ConnectionRequest.from:type_name -> connection.User
-	17, // 20: connection.ConnectionRequest.to:type_name -> connection.User
-	27, // 21: connection.ConnectionRequest.requestTime:type_name -> google.protobuf.Timestamp
-	24, // 22: connection.ConnectionBody.connection:type_name -> connection.Connection
-	6,  // 23: connection.ConnectionService.GetRequestsForUser:input_type -> connection.GetRequestUsername
-	25, // 24: connection.ConnectionService.AcceptConnectionRequest:input_type -> connection.UserUsername
-	25, // 25: connection.ConnectionService.DeleteConnectionRequest:input_type -> connection.UserUsername
-	25, // 26: connection.ConnectionService.DeleteConnection:input_type -> connection.UserUsername
-	25, // 27: connection.ConnectionService.RequestConnection:input_type -> connection.UserUsername
-	22, // 28: connection.ConnectionService.GetConnectionUsernamesForUser:input_type -> connection.ConnectionResponse
-	25, // 29: connection.ConnectionService.GetSuggestedConnectionUsernamesForUser:input_type -> connection.UserUsername
-	25, // 30: connection.ConnectionService.FindJobOffersBasedOnUserSkills:input_type -> connection.UserUsername
-	25, // 31: connection.ConnectionService.CheckIfUserConnected:input_type -> connection.UserUsername
-	25, // 32: connection.ConnectionService.BlockUser:input_type -> connection.UserUsername
-	25, // 33: connection.ConnectionService.UnBlockUser:input_type -> connection.UserUsername
-	14, // 34: connection.ConnectionService.GetEvents:input_type -> connection.EventRequest
-	20, // 35: connection.ConnectionService.GetRequestsForUser:output_type -> connection.ConnectionRequests
-	22, // 36: connection.ConnectionService.AcceptConnectionRequest:output_type -> connection.ConnectionResponse
-	22, // 37: connection.ConnectionService.DeleteConnectionRequest:output_type -> connection.ConnectionResponse
-	22, // 38: connection.ConnectionService.DeleteConnection:output_type -> connection.ConnectionResponse
-	8,  // 39: connection.ConnectionService.RequestConnection:output_type -> connection.ConnectionStatusResponse
-	26, // 40: connection.ConnectionService.GetConnectionUsernamesForUser:output_type -> connection.UserConnectionUsernames
-	26, // 41: connection.ConnectionService.GetSuggestedConnectionUsernamesForUser:output_type -> connection.UserConnectionUsernames
-	13, // 42: connection.ConnectionService.FindJobOffersBasedOnUserSkills:output_type -> connection.JobOffers
-	8,  // 43: connection.ConnectionService.CheckIfUserConnected:output_type -> connection.ConnectionStatusResponse
-	9,  // 44: connection.ConnectionService.BlockUser:output_type -> connection.GetAllRequest
-	9,  // 45: connection.ConnectionService.UnBlockUser:output_type -> connection.GetAllRequest
-	16, // 46: connection.ConnectionService.GetEvents:output_type -> connection.Events
-	35, // [35:47] is the sub-list for method output_type
-	23, // [23:35] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	15, // 6: connection.JobOfferRequest.dto:type_name -> connection.JobOfferDto
+	11, // 7: connection.JobOfferDto.company:type_name -> connection.Company
+	1,  // 8: connection.JobOfferDto.employment_type:type_name -> connection.EmploymentType
+	30, // 9: connection.Event.published:type_name -> google.protobuf.Timestamp
+	18, // 10: connection.Events.events:type_name -> connection.Event
+	2,  // 11: connection.User.gender:type_name -> connection.User.Gender
+	30, // 12: connection.User.dateOfBirth:type_name -> google.protobuf.Timestamp
+	21, // 13: connection.User.experiences:type_name -> connection.Experience
+	22, // 14: connection.User.educations:type_name -> connection.Education
+	3,  // 15: connection.Experience.employmentType:type_name -> connection.Experience.EmploymentType
+	30, // 16: connection.Experience.startDate:type_name -> google.protobuf.Timestamp
+	30, // 17: connection.Experience.endDate:type_name -> google.protobuf.Timestamp
+	4,  // 18: connection.Education.degree:type_name -> connection.Education.Degree
+	30, // 19: connection.Education.startDate:type_name -> google.protobuf.Timestamp
+	30, // 20: connection.Education.endDate:type_name -> google.protobuf.Timestamp
+	24, // 21: connection.ConnectionRequests.requests:type_name -> connection.ConnectionRequest
+	20, // 22: connection.ConnectionRequest.from:type_name -> connection.User
+	20, // 23: connection.ConnectionRequest.to:type_name -> connection.User
+	30, // 24: connection.ConnectionRequest.requestTime:type_name -> google.protobuf.Timestamp
+	27, // 25: connection.ConnectionBody.connection:type_name -> connection.Connection
+	6,  // 26: connection.ConnectionService.GetRequestsForUser:input_type -> connection.GetRequestUsername
+	28, // 27: connection.ConnectionService.AcceptConnectionRequest:input_type -> connection.UserUsername
+	28, // 28: connection.ConnectionService.DeleteConnectionRequest:input_type -> connection.UserUsername
+	28, // 29: connection.ConnectionService.DeleteConnection:input_type -> connection.UserUsername
+	28, // 30: connection.ConnectionService.RequestConnection:input_type -> connection.UserUsername
+	25, // 31: connection.ConnectionService.GetConnectionUsernamesForUser:input_type -> connection.ConnectionResponse
+	28, // 32: connection.ConnectionService.GetSuggestedConnectionUsernamesForUser:input_type -> connection.UserUsername
+	28, // 33: connection.ConnectionService.FindJobOffersBasedOnUserSkills:input_type -> connection.UserUsername
+	28, // 34: connection.ConnectionService.CheckIfUserConnected:input_type -> connection.UserUsername
+	28, // 35: connection.ConnectionService.BlockUser:input_type -> connection.UserUsername
+	28, // 36: connection.ConnectionService.UnBlockUser:input_type -> connection.UserUsername
+	17, // 37: connection.ConnectionService.GetEvents:input_type -> connection.EventRequest
+	14, // 38: connection.ConnectionService.CreateJobOffer:input_type -> connection.JobOfferRequest
+	23, // 39: connection.ConnectionService.GetRequestsForUser:output_type -> connection.ConnectionRequests
+	25, // 40: connection.ConnectionService.AcceptConnectionRequest:output_type -> connection.ConnectionResponse
+	25, // 41: connection.ConnectionService.DeleteConnectionRequest:output_type -> connection.ConnectionResponse
+	25, // 42: connection.ConnectionService.DeleteConnection:output_type -> connection.ConnectionResponse
+	8,  // 43: connection.ConnectionService.RequestConnection:output_type -> connection.ConnectionStatusResponse
+	29, // 44: connection.ConnectionService.GetConnectionUsernamesForUser:output_type -> connection.UserConnectionUsernames
+	29, // 45: connection.ConnectionService.GetSuggestedConnectionUsernamesForUser:output_type -> connection.UserConnectionUsernames
+	13, // 46: connection.ConnectionService.FindJobOffersBasedOnUserSkills:output_type -> connection.JobOffers
+	8,  // 47: connection.ConnectionService.CheckIfUserConnected:output_type -> connection.ConnectionStatusResponse
+	9,  // 48: connection.ConnectionService.BlockUser:output_type -> connection.GetAllRequest
+	9,  // 49: connection.ConnectionService.UnBlockUser:output_type -> connection.GetAllRequest
+	19, // 50: connection.ConnectionService.GetEvents:output_type -> connection.Events
+	5,  // 51: connection.ConnectionService.CreateJobOffer:output_type -> connection.GetRequest
+	39, // [39:52] is the sub-list for method output_type
+	26, // [26:39] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_connection_service_proto_init() }
@@ -2215,7 +2424,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EventRequest); i {
+			switch v := v.(*JobOfferRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2227,7 +2436,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Event); i {
+			switch v := v.(*JobOfferDto); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2239,7 +2448,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Events); i {
+			switch v := v.(*JobOfferResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2251,7 +2460,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*User); i {
+			switch v := v.(*EventRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2263,7 +2472,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Experience); i {
+			switch v := v.(*Event); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2275,7 +2484,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Education); i {
+			switch v := v.(*Events); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2287,7 +2496,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConnectionRequests); i {
+			switch v := v.(*User); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2299,7 +2508,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConnectionRequest); i {
+			switch v := v.(*Experience); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2311,7 +2520,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConnectionResponse); i {
+			switch v := v.(*Education); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2323,7 +2532,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConnectionBody); i {
+			switch v := v.(*ConnectionRequests); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2335,7 +2544,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Connection); i {
+			switch v := v.(*ConnectionRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2347,7 +2556,7 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserUsername); i {
+			switch v := v.(*ConnectionResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2359,6 +2568,42 @@ func file_connection_service_proto_init() {
 			}
 		}
 		file_connection_service_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ConnectionBody); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_connection_service_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Connection); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_connection_service_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserUsername); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_connection_service_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UserConnectionUsernames); i {
 			case 0:
 				return &v.state
@@ -2377,7 +2622,7 @@ func file_connection_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_connection_service_proto_rawDesc,
 			NumEnums:      5,
-			NumMessages:   22,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

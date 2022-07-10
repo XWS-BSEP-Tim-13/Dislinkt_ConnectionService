@@ -76,7 +76,7 @@ service ConnectionService{
     };
   }
 
-  rpc CreateJobOffer(JobOfferRequest) returns(JobOfferResponse){
+  rpc CreateJobOffer(JobOfferRequest) returns(GetRequest){
     option (google.api.http) = {
       post: "/conn/job-offer"
       body: "dto"
