@@ -296,12 +296,13 @@ func (u *ConnectionNeo4jStore) persistCompanyAsNode(tx neo4j.Transaction, compan
 }
 
 func (u *ConnectionNeo4jStore) persistJobOfferAsNode(tx neo4j.Transaction, offer *domain.JobOffer) (interface{}, error) {
-	query := "MERGE (:JobOfferNode {position: $position, company: $company, description: $description, type: $type})"
+	query := "MERGE (:JobOfferNode {position: $position, company: $company, description: $description, type: $type, prerequisites: $prerequisites})"
 	parameters := map[string]interface{}{
-		"position":    offer.Position,
-		"company":     offer.Company.CompanyName,
-		"description": offer.JobDescription,
-		"type":        offer.EmploymentType,
+		"position":      offer.Position,
+		"company":       offer.Company.CompanyName,
+		"description":   offer.JobDescription,
+		"type":          offer.EmploymentType,
+		"prerequisites": offer.Prerequisites,
 	}
 	_, err := tx.Run(query, parameters)
 	return nil, err
@@ -403,7 +404,7 @@ func (u *ConnectionNeo4jStore) findSuggestedConnectionsForUser(tx neo4j.Transact
 
 func (u *ConnectionNeo4jStore) findSuggestedJobOffersBasedOnUserSkills(tx neo4j.Transaction, username string) ([]*domain.JobOffer, error) {
 	records, err := tx.Run(
-		"MATCH (u:RegisteredUserNode {username: $username})-[r1:HAS_SKILL]->(skill)<-[r2:REQUIRES_SKILL]-(jobOffer) RETURN DISTINCT jobOffer.id as id, jobOffer.company as company, jobOffer.description as description, jobOffer.position as position, jobOffer.type as type",
+		"MATCH (u:RegisteredUserNode {username: $username})-[r1:HAS_SKILL]->(skill)<-[r2:REQUIRES_SKILL]-(jobOffer) RETURN DISTINCT jobOffer.id as id, jobOffer.company as company, jobOffer.description as description, jobOffer.position as position, jobOffer.type, jobOffer.prerequisites as type",
 		map[string]interface{}{
 			"username": username,
 		},
@@ -420,6 +421,7 @@ func (u *ConnectionNeo4jStore) findSuggestedJobOffersBasedOnUserSkills(tx neo4j.
 		jobOffer.JobDescription, _ = record.Values[2].(string)
 		jobOffer.Position, _ = record.Values[3].(string)
 		jobOffer.EmploymentType, _ = record.Values[4].(enum.EmploymentType)
+		jobOffer.Prerequisites, _ = record.Values[5].(string)
 		jobOffers = append(jobOffers, jobOffer)
 	}
 

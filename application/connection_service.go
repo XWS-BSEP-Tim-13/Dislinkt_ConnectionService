@@ -103,9 +103,29 @@ func (service *ConnectionService) GetConnectionSuggestionsForUser(ctx context.Co
 	ctx = tracer.ContextWithSpan(context.Background(), span)
 
 	var retVal []string
-	connections, _ := service.connectionNeo4j.FindSuggestedConnectionsForUser(username)
-	for _, connUsername := range connections {
-		retVal = append(retVal, connUsername)
+	suggestedConnections, _ := service.connectionNeo4j.FindSuggestedConnectionsForUser(username)
+
+	user, _ := service.userStore.GetActiveByUsername(ctx, username)
+	blockedUsers := user.BlockedUsers
+	connections := user.Connections
+	for _, connUsername := range suggestedConnections {
+		var result bool = false
+		for _, x := range blockedUsers {
+			if x == connUsername {
+				result = true
+				break
+			}
+		}
+
+		for _, x := range connections {
+			if x == connUsername {
+				result = true
+				break
+			}
+		}
+		if result == false {
+			retVal = append(retVal, connUsername)
+		}
 	}
 
 	return retVal, nil
@@ -162,7 +182,28 @@ func (service *ConnectionService) DeleteConnection(ctx context.Context, username
 	user.Connections = user.Connections[:len(user.Connections)-1]
 	err = service.userStore.Update(ctx, user)
 	fmt.Println("Delete stared...", usernameTo)
+	service.connectionNeo4j.DeleteConnection(usernameTo, usernameFrom)
+
+	userFrom, err := service.userStore.GetActiveByUsername(ctx, usernameFrom)
+	if err != nil {
+		return err
+	}
+	j := -1
+	for i, connection := range userFrom.Connections {
+		if connection == usernameTo {
+			j = i
+			break
+		}
+	}
+
+	if j == -1 {
+		return nil
+	}
+	userFrom.Connections[j] = userFrom.Connections[len(userFrom.Connections)-1]
+	userFrom.Connections = userFrom.Connections[:len(userFrom.Connections)-1]
+	err = service.userStore.Update(ctx, userFrom)
 	service.connectionNeo4j.DeleteConnection(usernameFrom, usernameTo)
+
 	var event = domain.Event{Id: primitive.NewObjectID(), User: usernameTo, Action: `Delete connection ` + usernameFrom, Published: time.Now()}
 	service.eventStore.Insert(&event)
 	return nil
