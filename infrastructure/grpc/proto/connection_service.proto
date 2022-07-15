@@ -1,0 +1,269 @@
+syntax = "proto3";
+
+option go_package = "github.com/XWS-BSEP-Tim-13/Dislinkt_ConnectionService/infrastructure/grpc/proto";
+
+package connection;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service ConnectionService{
+  rpc GetRequestsForUser(GetRequestUsername) returns(ConnectionRequests){
+    option(google.api.http) = {
+      get: "/conn/connection-request/by-user/{username}"
+    };
+  }
+
+  rpc AcceptConnectionRequest(UserUsername) returns(ConnectionResponse){
+    option(google.api.http) = {
+      post: "/conn/connection-request/accept/{username}"
+    };
+  }
+  rpc DeleteConnectionRequest(UserUsername) returns(ConnectionResponse){
+    option(google.api.http) = {
+      delete: "/conn/connection-request/{username}"
+    };
+  }
+
+  rpc DeleteConnection(UserUsername) returns(ConnectionResponse){
+    option(google.api.http) = {
+      put: "/conn/user/delete-connection/{username}"
+    };
+  }
+  rpc RequestConnection(UserUsername) returns(ConnectionStatusResponse){
+    option (google.api.http) = {
+      post: "/conn/connection-request/{username}"
+    };
+  }
+  rpc GetConnectionUsernamesForUser(ConnectionResponse) returns(UserConnectionUsernames){
+    option(google.api.http) = {
+      get: "/conn/user/user-connection-usernames",
+    };
+  }
+  rpc GetSuggestedConnectionUsernamesForUser(UserUsername) returns(UserConnectionUsernames){
+    option(google.api.http) = {
+      get: "/conn/user/suggested-connection-usernames/{username}",
+    };
+  }
+
+  rpc FindJobOffersBasedOnUserSkills(UserUsername) returns(JobOffers){
+    option(google.api.http) = {
+      get: "/conn/suggest-job-offers/{username}",
+    };
+  }
+
+  rpc CheckIfUserConnected(UserUsername)returns(ConnectionStatusResponse){
+    option(google.api.http) = {
+      get: "/conn/user/users-connected/{username}",
+    };
+  }
+
+  rpc BlockUser(UserUsername) returns(GetAllRequest){
+    option(google.api.http) = {
+      put: "/conn/user/block/{username}",
+    };
+  }
+
+  rpc UnBlockUser(UserUsername) returns(GetAllRequest){
+    option(google.api.http) = {
+      put: "/conn/user/unblock/{username}",
+    };
+  }
+
+  rpc GetEvents(EventRequest)returns(Events){
+    option(google.api.http) = {
+      get: "/conn/events",
+    };
+  }
+
+  rpc CreateJobOffer(JobOfferRequest) returns(GetRequest){
+    option (google.api.http) = {
+      post: "/conn/job-offer"
+      body: "dto"
+    };
+  }
+}
+
+message GetRequest {
+  string id = 1;
+}
+
+message GetRequestUsername {
+  string username = 1;
+}
+
+message GetResponse {
+  Company company = 1;
+}
+
+message ConnectionStatusResponse{
+  ConnectionStatus connectionStatus=1;
+}
+
+enum ConnectionStatus {
+  CONNECTED = 0;
+  CONNECTION_REQUEST = 1;
+  NONEE = 2;
+  BLOCKED = 3;
+  BLOCKED_ME =4;
+}
+
+message GetAllRequest {
+}
+
+message GetAllResponse {
+  repeated Company companies = 1;
+}
+
+message Company {
+  string id = 1;
+  string companyName = 2;
+  string username = 3;
+  string email = 4;
+  string phoneNumber = 5;
+  string description = 6;
+  string location = 7;
+  string website = 8;
+  string companySize = 9;
+  string industry = 10;
+}
+message JobOffer {
+  string id = 1;
+  string position = 2;
+  string jobDescription = 3;
+  string prerequisites = 4;
+  Company company = 5;
+  EmploymentType employment_type=6;
+}
+
+message JobOffers {
+  repeated JobOffer jobOffers = 1;
+}
+
+message  JobOfferRequest{
+  JobOfferDto dto=1;
+}
+message  JobOfferDto{
+  string position = 1;
+  string jobDescription = 2;
+  string prerequisites = 3;
+  Company company = 4;
+  EmploymentType employment_type=5;
+}
+message  JobOfferResponse{
+  string id=1;
+}
+
+message EventRequest {
+}
+
+message Event {
+  string id = 1;
+  string action = 2;
+  string user = 3;
+  google.protobuf.Timestamp published = 4;
+}
+
+message Events {
+  repeated Event events = 1;
+}
+
+enum EmploymentType {
+  FULL_TIME = 0;
+  PART_TIME = 1;
+  INTERNSHIP = 2;
+  NONE = 3;
+}
+
+message User {
+  string id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  string phoneNumber = 5;
+
+  enum Gender {
+    MALE = 0;
+    FEMALE = 1;
+  }
+
+  Gender gender = 6;
+
+  google.protobuf.Timestamp dateOfBirth = 7;
+  string biography = 8;
+  bool isPrivate = 9;
+  repeated Experience experiences = 10;
+  repeated Education educations = 11;
+  repeated string skills = 12;
+  repeated string interests = 13;
+  repeated string connections = 14;
+  string username = 15;
+}
+
+message Experience {
+  string id = 1;
+  string title = 2;
+
+  enum EmploymentType {
+    FULL_TIME = 0;
+    PART_TIME = 1;
+    INTERNSHIP = 2;
+  }
+
+  EmploymentType employmentType = 3;
+  string companyName = 4;
+  string location = 5;
+  bool isCurrentlyWorking = 6;
+  google.protobuf.Timestamp startDate = 7;
+  google.protobuf.Timestamp endDate = 8;
+  string industry = 9;
+  string description = 10;
+}
+
+message Education {
+  string id = 1;
+  string school = 2;
+
+  enum Degree {
+    ASSOCIATE = 0;
+    BACHELORS = 1;
+    MASTERS = 2;
+    DOCTORAL = 3;
+  }
+
+  Degree degree = 3;
+  string fieldOfStudy = 4;
+  google.protobuf.Timestamp startDate = 5;
+  google.protobuf.Timestamp endDate = 6;
+  string description = 7;
+}
+
+message ConnectionRequests{
+  repeated ConnectionRequest requests= 1;
+}
+
+message ConnectionRequest {
+  string id = 1;
+  User from = 2;
+  User to = 3;
+  google.protobuf.Timestamp requestTime = 4;
+}
+
+message ConnectionResponse{}
+
+message ConnectionBody{
+  Connection connection = 1;
+}
+
+message Connection{
+  string usernameFrom = 1;
+  string usernameTo = 2;
+}
+
+message UserUsername{
+  string username = 1;
+}
+
+message UserConnectionUsernames{
+  repeated string usernames = 1;
+}
